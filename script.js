@@ -94,6 +94,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Gallery slideshow =====
   setupGallery(reduceMotion);
 
+  // ===== Customer reviews + submission form =====
+  setupReviews(reduceMotion);
+
   // Scroll-reveal animations: stagger elements in as they enter the viewport.
   setupReveal(reduceMotion, ".reveal", 90);
 
@@ -355,4 +358,157 @@ function setupGallery(reduceMotion) {
     },
     { passive: true }
   );
+}
+
+function setupReviews(reduceMotion) {
+  const grid = document.querySelector("[data-reviews]");
+  const form = document.querySelector("[data-review-form]");
+  if (!grid || !form) return;
+
+  const STORAGE_KEY = "magrim-reviews";
+  const ratingInput = form.querySelector("[data-rating-input]");
+  const stars = ratingInput
+    ? Array.prototype.slice.call(ratingInput.querySelectorAll(".rating-star"))
+    : [];
+  const messageEl = form.querySelector("[data-form-message]");
+  const nameInput = form.querySelector('[name="name"]');
+  const commentInput = form.querySelector('[name="comment"]');
+  let rating = 0;
+
+  function readStored() {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  function writeStored(list) {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      /* storage unavailable — the review still shows for this visit */
+    }
+  }
+
+  function paintStars(value) {
+    stars.forEach(function (star, i) {
+      star.classList.toggle("is-active", i < value);
+    });
+  }
+  function setRating(value) {
+    rating = value;
+    paintStars(value);
+  }
+
+  stars.forEach(function (star) {
+    const value = parseInt(star.getAttribute("data-value"), 10);
+    star.addEventListener("click", function () {
+      setRating(value);
+    });
+    star.addEventListener("mouseenter", function () {
+      paintStars(value);
+    });
+  });
+  if (ratingInput) {
+    ratingInput.addEventListener("mouseleave", function () {
+      paintStars(rating);
+    });
+  }
+
+  function buildCard(review) {
+    const card = document.createElement("article");
+    card.className = "review-card reveal";
+
+    const starsEl = document.createElement("div");
+    starsEl.className = "stars";
+    starsEl.setAttribute("aria-label", review.rating + " out of 5 stars");
+    for (let i = 1; i <= 5; i++) {
+      const s = document.createElement("span");
+      s.className = i <= review.rating ? "star-on" : "star-off";
+      s.textContent = "★";
+      starsEl.appendChild(s);
+    }
+
+    const text = document.createElement("p");
+    text.className = "review-text";
+    text.textContent = "“" + review.comment + "”";
+
+    const reviewer = document.createElement("div");
+    reviewer.className = "reviewer";
+    const avatar = document.createElement("span");
+    avatar.className = "reviewer-avatar";
+    avatar.setAttribute("aria-hidden", "true");
+    avatar.textContent = (review.name.trim().charAt(0) || "?").toUpperCase();
+    const meta = document.createElement("div");
+    const strong = document.createElement("strong");
+    strong.textContent = review.name;
+    const metaSpan = document.createElement("span");
+    metaSpan.className = "reviewer-meta";
+    metaSpan.textContent = "Customer review";
+    meta.appendChild(strong);
+    meta.appendChild(metaSpan);
+    reviewer.appendChild(avatar);
+    reviewer.appendChild(meta);
+
+    card.appendChild(starsEl);
+    card.appendChild(text);
+    card.appendChild(reviewer);
+    return card;
+  }
+
+  // Render any reviews saved in this browser, newest first.
+  readStored().forEach(function (review) {
+    grid.insertBefore(buildCard(review), grid.firstChild);
+  });
+
+  function showMessage(text, type) {
+    if (!messageEl) return;
+    messageEl.textContent = text;
+    messageEl.className = "form-message is-" + type;
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const name = nameInput.value.trim();
+    const comment = commentInput.value.trim();
+
+    if (!name) {
+      showMessage("Please enter your name.", "error");
+      nameInput.focus();
+      return;
+    }
+    if (rating < 1) {
+      showMessage("Please select a star rating.", "error");
+      return;
+    }
+    if (comment.length < 4) {
+      showMessage("Please write a short review.", "error");
+      commentInput.focus();
+      return;
+    }
+
+    const review = { name: name, rating: rating, comment: comment };
+    const list = readStored();
+    list.push(review);
+    writeStored(list);
+
+    const card = buildCard(review);
+    grid.insertBefore(card, grid.firstChild);
+    if (reduceMotion) {
+      card.classList.add("is-visible");
+    } else {
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(function () {
+          card.classList.add("is-visible");
+        });
+      });
+    }
+
+    form.reset();
+    setRating(0);
+    showMessage("Thank you! Your review has been added.", "success");
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
 }

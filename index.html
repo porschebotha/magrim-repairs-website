@@ -234,13 +234,16 @@
     <!-- ===== Reviews ===== -->
     <section id="reviews" class="section section-alt">
       <div class="container">
-        <h2 class="section-title reveal">What Customers Say</h2>
+        <h2 class="section-title reveal">What Our Clients Say</h2>
         <p class="section-intro reveal">
-          Real feedback from drivers across Windhoek.
+          Real feedback from drivers across Windhoek &mdash; and share your own
+          experience using the form below.
         </p>
-        <div class="reviews-grid">
+        <div class="reviews-grid" data-reviews>
           <article class="review-card reveal">
-            <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="stars" aria-label="5 out of 5 stars">
+              <span class="star-on">&#9733;</span><span class="star-on">&#9733;</span><span class="star-on">&#9733;</span><span class="star-on">&#9733;</span><span class="star-on">&#9733;</span>
+            </div>
             <p class="review-text">
               &ldquo;Hit a pothole and badly buckled my rim. Magrim
               straightened it perfectly and it drives true again. Highly
@@ -255,7 +258,9 @@
             </div>
           </article>
           <article class="review-card reveal">
-            <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="stars" aria-label="5 out of 5 stars">
+              <span class="star-on">&#9733;</span><span class="star-on">&#9733;</span><span class="star-on">&#9733;</span><span class="star-on">&#9733;</span><span class="star-on">&#9733;</span>
+            </div>
             <p class="review-text">
               &ldquo;My alloys were full of curb scuffs. They came back
               refurbished and looking brand new. Friendly service and a fair
@@ -270,7 +275,9 @@
             </div>
           </article>
           <article class="review-card reveal">
-            <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="stars" aria-label="5 out of 5 stars">
+              <span class="star-on">&#9733;</span><span class="star-on">&#9733;</span><span class="star-on">&#9733;</span><span class="star-on">&#9733;</span><span class="star-on">&#9733;</span>
+            </div>
             <p class="review-text">
               &ldquo;Sent photos on WhatsApp and Marius replied quickly with a
               quote. Honest advice and proper professional work.&rdquo;
@@ -283,6 +290,61 @@
               </div>
             </div>
           </article>
+        </div>
+
+        <!-- Review submission form -->
+        <div class="review-form-card reveal">
+          <h3 class="review-form-title">Leave a Review</h3>
+          <p class="review-form-note">
+            Tell us about your experience with Magrim Repairs.
+          </p>
+          <form class="review-form" data-review-form novalidate>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label" for="review-name">Your Name</label>
+                <input
+                  type="text"
+                  id="review-name"
+                  name="name"
+                  class="form-input"
+                  maxlength="60"
+                  placeholder="e.g. John K."
+                  required
+                />
+              </div>
+              <div class="form-field">
+                <span class="form-label">Your Rating</span>
+                <div
+                  class="rating-input"
+                  data-rating-input
+                  role="radiogroup"
+                  aria-label="Star rating"
+                >
+                  <button type="button" class="rating-star" data-value="1" aria-label="1 star">&#9733;</button>
+                  <button type="button" class="rating-star" data-value="2" aria-label="2 stars">&#9733;</button>
+                  <button type="button" class="rating-star" data-value="3" aria-label="3 stars">&#9733;</button>
+                  <button type="button" class="rating-star" data-value="4" aria-label="4 stars">&#9733;</button>
+                  <button type="button" class="rating-star" data-value="5" aria-label="5 stars">&#9733;</button>
+                </div>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="review-comment">Your Review</label>
+              <textarea
+                id="review-comment"
+                name="comment"
+                class="form-input form-textarea"
+                rows="4"
+                maxlength="400"
+                placeholder="Tell us about the work we did for you..."
+                required
+              ></textarea>
+            </div>
+            <div class="form-footer">
+              <button type="submit" class="btn btn-whatsapp">Submit Review</button>
+              <p class="form-message" data-form-message role="status" aria-live="polite"></p>
+            </div>
+          </form>
         </div>
       </div>
     </section>
