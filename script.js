@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ).matches;
 
   // ===== Gallery slideshow =====
-  setupGallery();
+  setupGallery(reduceMotion);
 
   // Scroll-reveal animations: stagger elements in as they enter the viewport.
   setupReveal(reduceMotion, ".reveal", 90);
@@ -152,78 +152,128 @@ function setupImageFallbacks() {
   });
 }
 
-function setupGallery() {
-  const track = document.querySelector("[data-gallery-track]");
+function setupGallery(reduceMotion) {
+  const track = document.querySelector("[data-slideshow-track]");
   const images = CONFIG.galleryImages || [];
   if (!track || images.length === 0) return;
 
-  // Build the horizontal slideshow of clickable thumbnails.
+  const slideshow = document.querySelector("[data-slideshow]");
+  const prevArrow = document.querySelector("[data-slideshow-prev]");
+  const nextArrow = document.querySelector("[data-slideshow-next]");
+  const counter = document.querySelector("[data-slideshow-counter]");
+
+  let index = 0;
+  let timer = null;
+
+  // Build one full-width slide per image.
   images.forEach(function (file, i) {
-    const item = document.createElement("figure");
-    item.className = "gallery-item";
-    item.tabIndex = 0;
-    item.setAttribute("role", "button");
-    item.setAttribute("aria-label", "View photo " + (i + 1));
+    const slide = document.createElement("figure");
+    slide.className = "slideshow-slide";
+    slide.tabIndex = 0;
+    slide.setAttribute("role", "button");
+    slide.setAttribute("aria-label", "View photo " + (i + 1) + " full screen");
 
     const img = document.createElement("img");
     img.src = "images/" + file;
     img.alt = "Magrim Repairs completed rim repair work";
-    img.loading = "lazy";
+    img.loading = i < 2 ? "eager" : "lazy";
     img.setAttribute("data-fallback", "Photo " + (i + 1));
-    item.appendChild(img);
+    slide.appendChild(img);
 
-    item.addEventListener("click", function () {
+    slide.addEventListener("click", function () {
       openLightbox(i);
     });
-    item.addEventListener("keydown", function (e) {
+    slide.addEventListener("keydown", function (e) {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         openLightbox(i);
       }
     });
 
-    track.appendChild(item);
+    track.appendChild(slide);
   });
 
-  // ===== Slideshow arrows =====
-  const carousel = document.querySelector("[data-gallery-carousel]");
-  const prevArrow = carousel
-    ? carousel.querySelector("[data-gallery-prev]")
-    : null;
-  const nextArrow = carousel
-    ? carousel.querySelector("[data-gallery-next]")
-    : null;
-
-  function updateArrows() {
-    if (!prevArrow || !nextArrow) return;
-    const maxScroll = track.scrollWidth - track.clientWidth - 2;
-    prevArrow.disabled = track.scrollLeft <= 2;
-    nextArrow.disabled = track.scrollLeft >= maxScroll;
+  function goTo(i) {
+    index = (i + images.length) % images.length;
+    track.style.transform = "translateX(-" + index * 100 + "%)";
+    if (counter) counter.textContent = index + 1 + " / " + images.length;
   }
 
-  function pageBy(direction) {
-    // Scroll by roughly one viewport, snapped to whole items.
-    const item = track.querySelector(".gallery-item");
-    const step = item
-      ? item.getBoundingClientRect().width + 16
-      : track.clientWidth;
-    const perPage = Math.max(1, Math.floor(track.clientWidth / step));
-    track.scrollBy({ left: direction * perPage * step, behavior: "smooth" });
+  function startAuto() {
+    if (reduceMotion || images.length < 2) return;
+    timer = window.setInterval(function () {
+      goTo(index + 1);
+    }, 5000);
+  }
+  function stopAuto() {
+    if (timer) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  }
+  function restartAuto() {
+    stopAuto();
+    startAuto();
   }
 
   if (prevArrow) {
     prevArrow.addEventListener("click", function () {
-      pageBy(-1);
+      goTo(index - 1);
+      restartAuto();
     });
   }
   if (nextArrow) {
     nextArrow.addEventListener("click", function () {
-      pageBy(1);
+      goTo(index + 1);
+      restartAuto();
     });
   }
-  track.addEventListener("scroll", updateArrows, { passive: true });
-  window.addEventListener("resize", updateArrows, { passive: true });
-  updateArrows();
+
+  if (slideshow) {
+    // Pause auto-advance while the visitor is interacting.
+    slideshow.addEventListener("mouseenter", stopAuto);
+    slideshow.addEventListener("mouseleave", startAuto);
+    slideshow.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") {
+        goTo(index - 1);
+        restartAuto();
+      } else if (e.key === "ArrowRight") {
+        goTo(index + 1);
+        restartAuto();
+      }
+    });
+  }
+
+  // Touch swipe to slide left/right.
+  let swipeX = 0;
+  let swiping = false;
+  track.addEventListener(
+    "touchstart",
+    function (e) {
+      swipeX = e.touches[0].clientX;
+      swiping = true;
+      stopAuto();
+    },
+    { passive: true }
+  );
+  track.addEventListener(
+    "touchend",
+    function (e) {
+      if (!swiping) return;
+      swiping = false;
+      const dx = e.changedTouches[0].clientX - swipeX;
+      if (Math.abs(dx) > 45) goTo(index + (dx < 0 ? 1 : -1));
+      restartAuto();
+    },
+    { passive: true }
+  );
+
+  window.addEventListener("resize", function () {
+    track.style.transform = "translateX(-" + index * 100 + "%)";
+  });
+
+  goTo(0);
+  startAuto();
 
   // ===== Lightbox =====
   const lightbox = document.querySelector("[data-lightbox]");

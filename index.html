@@ -59,33 +59,31 @@
 
   <main>
     <!-- ===== Hero ===== -->
-    <!-- The hero background image is set in styles.css (.hero). To use a
-         different photo, change the background-image file name there. -->
+    <!-- The hero background image (images/logo-4.png) is set on .hero-bg in
+         styles.css. Change the file name there to use a different photo. -->
     <section id="home" class="hero">
+      <div class="hero-bg" aria-hidden="true"></div>
       <div class="hero-overlay" aria-hidden="true"></div>
-      <div class="hero-glow" aria-hidden="true"></div>
-      <div class="container hero-inner reveal">
-        <p class="eyebrow">Windhoek, Namibia &middot; Over 20 Years Experience</p>
-        <h1>
-          Expert Alloy Wheel Repairs
-          <span class="text-red">in Windhoek</span>
+      <div class="container hero-inner">
+        <span class="hero-bar hero-reveal" aria-hidden="true"></span>
+        <p class="eyebrow hero-reveal">Windhoek, Namibia &middot; 20+ Years of Experience</p>
+        <h1 class="hero-reveal">
+          Expert Alloy Wheel
+          <span class="text-red">Repairs &amp; Refurbishment</span>
         </h1>
-        <p class="hero-text">
-          Magrim Repairs is a well-established specialist offering expert
-          repairs, customization and refurbishing for all makes of alloy
-          wheels &mdash; for passenger cars, motorcycles and quad bikes.
+        <p class="hero-text hero-reveal">
+          Magrim Repairs restores damaged, buckled and scuffed alloy wheels
+          for passenger cars, motorcycles and quad bikes &mdash; fast,
+          professional workmanship you can trust.
         </p>
-        <p class="hero-cta-line">
-          Send us photos of your damaged rims for a quote.
-        </p>
-        <div class="hero-actions">
-          <a href="#" class="btn btn-whatsapp" data-whatsapp>
+        <div class="hero-actions hero-reveal">
+          <a href="#" class="btn btn-whatsapp btn-lg" data-whatsapp>
             <span class="wa-icon" aria-hidden="true">&#128172;</span>
             WhatsApp Us
           </a>
-          <a href="#gallery" class="btn btn-ghost">View Our Work</a>
+          <a href="#gallery" class="btn btn-ghost btn-lg">View Our Work</a>
         </div>
-        <div class="hero-stats">
+        <div class="hero-stats hero-reveal">
           <div class="stat">
             <span class="stat-num">20+</span>
             <span class="stat-label">Years of Experience</span>
@@ -95,11 +93,15 @@
             <span class="stat-label">Makes of Alloy Wheels</span>
           </div>
           <div class="stat">
-            <span class="stat-num">3</span>
-            <span class="stat-label">Cars, Motorcycles &amp; Quads</span>
+            <span class="stat-num">500+</span>
+            <span class="stat-label">Wheels Restored</span>
           </div>
         </div>
       </div>
+      <a href="#about" class="hero-scroll" aria-label="Scroll to content">
+        <span class="hero-scroll-text">Scroll</span>
+        <span class="hero-scroll-arrow" aria-hidden="true">&#8595;</span>
+      </a>
     </section>
 
     <!-- ===== About ===== -->
@@ -154,7 +156,7 @@
         </p>
         <div class="services-grid">
           <article class="service-card reveal">
-            <span class="service-icon" aria-hidden="true">&#9881;</span>
+            <span class="service-index" aria-hidden="true">01</span>
             <h3>Wheel Straightening &amp; Welding</h3>
             <p>
               Professional repairs for buckled, cracked or severely damaged
@@ -162,7 +164,7 @@
             </p>
           </article>
           <article class="service-card reveal">
-            <span class="service-icon" aria-hidden="true">&#10024;</span>
+            <span class="service-index" aria-hidden="true">02</span>
             <h3>Refurbishing &amp; Customization</h3>
             <p>
               Restoring scuffed or curb-damaged alloy wheels, plus custom paint
@@ -170,7 +172,7 @@
             </p>
           </article>
           <article class="service-card reveal">
-            <span class="service-icon" aria-hidden="true">&#128663;</span>
+            <span class="service-index" aria-hidden="true">03</span>
             <h3>Vehicle Compatibility</h3>
             <p>
               Alloy wheel services for passenger cars, motorcycles and quad
@@ -189,7 +191,7 @@
     </section>
 
     <!-- ===== Gallery ===== -->
-    <!-- The slideshow tiles are built by script.js from the image list in
+    <!-- The slideshow is built by script.js from the image list in
          CONFIG.galleryImages, using the photos in the images/ folder. -->
     <section id="gallery" class="section">
       <div class="container">
@@ -197,24 +199,23 @@
         <p class="section-intro reveal">
           A look at completed alloy wheel repairs, refurbishing and
           customization jobs from the Magrim Repairs workshop. Use the arrows
-          to browse, and tap any photo to view it larger.
+          to browse, and tap a photo to view it full screen.
         </p>
-        <div class="gallery-carousel reveal" data-gallery-carousel>
+        <div class="slideshow reveal" data-slideshow aria-label="Recent rim repair work">
+          <div class="slideshow-viewport">
+            <div class="slideshow-track" data-slideshow-track></div>
+          </div>
           <button
-            class="gallery-arrow gallery-prev"
-            data-gallery-prev
-            aria-label="Previous photos"
+            class="slideshow-arrow slideshow-prev"
+            data-slideshow-prev
+            aria-label="Previous photo"
           >&#10094;</button>
-          <div
-            class="gallery-viewport"
-            data-gallery-track
-            aria-label="Recent rim repair work"
-          ></div>
           <button
-            class="gallery-arrow gallery-next"
-            data-gallery-next
-            aria-label="Next photos"
+            class="slideshow-arrow slideshow-next"
+            data-slideshow-next
+            aria-label="Next photo"
           >&#10095;</button>
+          <div class="slideshow-counter" data-slideshow-counter></div>
         </div>
       </div>
     </section>
