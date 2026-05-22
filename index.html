@@ -45,7 +45,11 @@
 
   <main>
     <!-- ===== Hero ===== -->
+    <!-- The hero background image is set in styles.css (.hero) and loads from
+         images/hero.jpg. PLACEHOLDER: add a large professional automotive
+         workshop / alloy wheel photo at images/hero.jpg. -->
     <section id="home" class="hero">
+      <div class="hero-overlay" aria-hidden="true"></div>
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="container hero-inner reveal">
         <p class="eyebrow">Windhoek, Namibia &middot; Over 20 Years Experience</p>
@@ -165,6 +169,9 @@
     </section>
 
     <!-- ===== Gallery (carousel) ===== -->
+    <!-- PLACEHOLDER: add the job photos to the images/ folder using the file
+         names below (rim-1.jpg ... rim-5.jpg, car-1.jpg ... car-5.jpg).
+         Until then each slide shows a styled placeholder automatically. -->
     <section id="gallery" class="section">
       <div class="container">
         <h2 class="section-title reveal">Our Recent Rim Repair Work</h2>
@@ -181,25 +188,35 @@
         >
           <div class="carousel-viewport">
             <div class="carousel-track" data-carousel-track>
-              <!-- PLACEHOLDER: replace each slide's placeholder div with a real
-                   photo, e.g. <img src="images/job-1.jpg" alt="Completed rim repair" /> -->
               <figure class="carousel-slide">
-                <div class="media-placeholder">Job Photo 1</div>
+                <img src="images/rim-1.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 1" />
               </figure>
               <figure class="carousel-slide">
-                <div class="media-placeholder">Job Photo 2</div>
+                <img src="images/rim-2.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 2" />
               </figure>
               <figure class="carousel-slide">
-                <div class="media-placeholder">Job Photo 3</div>
+                <img src="images/rim-3.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 3" />
               </figure>
               <figure class="carousel-slide">
-                <div class="media-placeholder">Job Photo 4</div>
+                <img src="images/rim-4.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 4" />
               </figure>
               <figure class="carousel-slide">
-                <div class="media-placeholder">Job Photo 5</div>
+                <img src="images/rim-5.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 5" />
               </figure>
               <figure class="carousel-slide">
-                <div class="media-placeholder">Job Photo 6</div>
+                <img src="images/car-1.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 1" />
+              </figure>
+              <figure class="carousel-slide">
+                <img src="images/car-2.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 2" />
+              </figure>
+              <figure class="carousel-slide">
+                <img src="images/car-3.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 3" />
+              </figure>
+              <figure class="carousel-slide">
+                <img src="images/car-4.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 4" />
+              </figure>
+              <figure class="carousel-slide">
+                <img src="images/car-5.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 5" />
               </figure>
             </div>
           </div>
@@ -309,7 +326,7 @@
               </li>
               <li>
                 <span class="contact-label">Phone / WhatsApp</span>
-                <a href="tel:+264811241463" class="contact-link" data-phone-link>
+                <a href="tel:+264811241463" class="contact-link">
                   +264 81 124 1463
                 </a>
               </li>
@@ -340,9 +357,15 @@
             </div>
           </div>
           <div class="contact-media reveal">
-            <!-- PLACEHOLDER: replace with a real photo of repaired wheels, e.g.
-                 <img src="images/rim.jpg" alt="Refurbished alloy wheel" /> -->
-            <div class="media-placeholder">Your photo here</div>
+            <!-- image-1: add the file at images/image-1.jpg. Until then a
+                 styled placeholder is shown automatically. -->
+            <img
+              src="images/image-1.jpg"
+              alt="Magrim Repairs alloy wheel work"
+              class="contact-image"
+              loading="lazy"
+              data-fallback="Your photo here"
+            />
           </div>
         </div>
       </div>

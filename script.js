@@ -101,9 +101,35 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // ===== Image fallbacks =====
+  // Until the real photos are committed to images/, show a styled
+  // placeholder in place of any image that fails to load.
+  setupImageFallbacks();
+
   // ===== Gallery carousel =====
   setupCarousel(reduceMotion);
 });
+
+function setupImageFallbacks() {
+  function replaceWithPlaceholder(img) {
+    if (!img.parentNode || img.dataset.fallbackDone) return;
+    img.dataset.fallbackDone = "1";
+    const ph = document.createElement("div");
+    ph.className = "media-placeholder";
+    ph.textContent = img.getAttribute("data-fallback") || "Photo coming soon";
+    img.parentNode.replaceChild(ph, img);
+  }
+
+  document.querySelectorAll("img[data-fallback]").forEach(function (img) {
+    if (img.complete && img.naturalWidth === 0) {
+      replaceWithPlaceholder(img);
+    } else {
+      img.addEventListener("error", function () {
+        replaceWithPlaceholder(img);
+      });
+    }
+  });
+}
 
 function setupCarousel(reduceMotion) {
   const carousel = document.querySelector("[data-carousel]");
