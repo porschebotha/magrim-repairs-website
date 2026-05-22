@@ -13,11 +13,16 @@ It is a plain static site — no build step needed.
 
 ## Files
 
-| File         | Purpose                                            |
-|--------------|----------------------------------------------------|
-| `index.html` | Page content and structure                         |
-| `styles.css` | Styling (dark automotive theme, responsive layout) |
-| `script.js`  | WhatsApp links, footer year, mobile menu           |
+| File         | Purpose                                                         |
+|--------------|-----------------------------------------------------------------|
+| `index.html` | Page content and structure                                      |
+| `styles.css` | Styling (dark automotive theme, responsive layout)              |
+| `script.js`  | WhatsApp links, footer year, mobile menu, scroll animations     |
+
+## Sections
+
+Hero, About, Services, Work Gallery, Before & After, Customer Reviews, a
+call-to-action banner, and Contact — plus a floating WhatsApp button.
 
 ## Things to customise
 
@@ -26,5 +31,6 @@ It is a plain static site — no build step needed.
 2. **Logo** — replace the text logo in `index.html` (look for the
    `PLACEHOLDER` comment near `.brand`) with an `<img>` tag.
 3. **Photos** — replace the `.media-placeholder` boxes in `index.html`
-   (About and Contact sections) with real `<img>` tags. Search the file
-   for `PLACEHOLDER` to find each spot.
+   with real `<img>` tags. They appear in the About, Gallery,
+   Before & After, and Contact sections. Search the file for
+   `PLACEHOLDER` to find each spot.

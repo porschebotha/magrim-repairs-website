@@ -56,4 +56,46 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   }
+
+  // Add a subtle border to the header once the page is scrolled.
+  const header = document.querySelector(".site-header");
+  if (header) {
+    const onScroll = function () {
+      header.classList.toggle("scrolled", window.scrollY > 12);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+  }
+
+  // Scroll-reveal animations: stagger elements in as they enter the viewport.
+  const revealEls = document.querySelectorAll(".reveal");
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    revealEls.forEach(function (el) {
+      el.classList.add("is-visible");
+    });
+  } else {
+    const observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const siblings = Array.prototype.slice.call(
+            el.parentElement.querySelectorAll(":scope > .reveal")
+          );
+          const delay = Math.max(0, siblings.indexOf(el)) * 90;
+          el.style.transitionDelay = delay + "ms";
+          el.classList.add("is-visible");
+          observer.unobserve(el);
+        });
+      },
+      { threshold: 0.15 }
+    );
+    revealEls.forEach(function (el) {
+      observer.observe(el);
+    });
+  }
 });
