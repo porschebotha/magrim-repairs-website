@@ -1,7 +1,7 @@
 # Magrim Repairs Website
 
-A modern, mobile-friendly one-page website for **Magrim Repairs** — an alloy
-wheel repair specialist in Windhoek, Namibia.
+A modern, mobile-friendly one-page website for **Magrim Repairs** — an
+aluminum wheel repair specialist in Windhoek, Namibia.
 
 ## Run it
 
