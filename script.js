@@ -14,8 +14,26 @@ const CONFIG = {
   // PLACEHOLDER: replace with the real Magrim Repairs Facebook Page URL.
   facebookUrl: "https://www.facebook.com/",
 
-  // Gallery carousel auto-slide interval, in milliseconds.
-  carouselInterval: 4500,
+  // Gallery photos for "Our Recent Rim Repair Work". File names refer to
+  // images in the images/ folder. Add or remove entries to update the
+  // gallery — the grid and lightbox rebuild automatically.
+  galleryImages: [
+    "car-1.JPG", "car-2.JPG", "car-3.JPG", "car-4.JPG", "car-5.JPG",
+    "car-6.JPG", "car-7.JPG", "car-8.JPG", "car-9.JPG", "car-10.JPG",
+    "car-11.jpg", "car-12.jpg", "car-13.jpg", "car-14.jpg",
+    "rim-1.JPG", "rim-2.JPG", "rim-3.JPG", "rim-4.JPG", "rim-5.JPG",
+    "rim-6.JPG", "rim-7.JPG", "rim-8.JPG", "rim-9.JPG", "rim-10.JPG",
+    "rim-11.JPG", "rim-12.JPG", "rim-13.JPG", "rim-14.JPG", "rim-15.JPG",
+    "rim-16.JPG", "rim-17.JPG", "rim-18.JPG", "rim-19.JPG", "rim-20.JPG",
+    "rim-21.JPG", "rim-22.JPG", "rim-23.JPG", "rim-24.JPG", "rim-26.JPG",
+    "rim-27.JPG", "rim-28.JPG", "rim-29.JPG", "rim-30.JPG", "rim-31.JPG",
+    "rim-32.jpg", "rim-33.jpg", "rim-34.jpg", "rim-35.jpg", "rim-36.JPG",
+    "rim-37.jpg", "rim-38.JPG", "rim-39.JPG", "rim-40.JPG", "rim-41.JPG",
+    "rim-42.JPG", "rim-43.JPG", "rim-44.JPG", "rim-45.JPG", "rim-46.JPG",
+    "rim-47.JPG", "rim-48.JPG", "rim-49.JPG", "rim-50.JPG", "rim-51.JPG",
+    "rim-52.JPG", "rim-53.JPG", "rim-54.JPG", "rim-55.JPG", "rim-56.JPG",
+    "rim-57.JPG", "rim-58.JPG", "rim-59.JPG", "rim-278.JPG",
+  ],
 };
 
 /* ------------------------------------------------------------- */
@@ -73,42 +91,46 @@ document.addEventListener("DOMContentLoaded", function () {
     "(prefers-reduced-motion: reduce)"
   ).matches;
 
+  // ===== Gallery (build the grid before observing reveal elements) =====
+  setupGallery();
+
   // Scroll-reveal animations: stagger elements in as they enter the viewport.
-  const revealEls = document.querySelectorAll(".reveal");
-  if (reduceMotion || !("IntersectionObserver" in window)) {
-    revealEls.forEach(function (el) {
-      el.classList.add("is-visible");
-    });
-  } else {
-    const observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          const el = entry.target;
-          const siblings = Array.prototype.slice.call(
-            el.parentElement.querySelectorAll(":scope > .reveal")
-          );
-          const delay = Math.max(0, siblings.indexOf(el)) * 90;
-          el.style.transitionDelay = delay + "ms";
-          el.classList.add("is-visible");
-          observer.unobserve(el);
-        });
-      },
-      { threshold: 0.15 }
-    );
-    revealEls.forEach(function (el) {
-      observer.observe(el);
-    });
-  }
+  setupReveal(reduceMotion, ".reveal", 90);
+  setupReveal(reduceMotion, ".gallery-item", 45);
 
   // ===== Image fallbacks =====
-  // Until the real photos are committed to images/, show a styled
-  // placeholder in place of any image that fails to load.
+  // Show a styled placeholder in place of any image that fails to load.
   setupImageFallbacks();
-
-  // ===== Gallery carousel =====
-  setupCarousel(reduceMotion);
 });
+
+function setupReveal(reduceMotion, selector, step) {
+  const els = document.querySelectorAll(selector);
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    els.forEach(function (el) {
+      el.classList.add("is-visible");
+    });
+    return;
+  }
+  const observer = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const siblings = Array.prototype.slice.call(
+          el.parentElement.querySelectorAll(":scope > " + selector)
+        );
+        const delay = Math.min(8, Math.max(0, siblings.indexOf(el))) * step;
+        el.style.transitionDelay = delay + "ms";
+        el.classList.add("is-visible");
+        observer.unobserve(el);
+      });
+    },
+    { threshold: 0.12 }
+  );
+  els.forEach(function (el) {
+    observer.observe(el);
+  });
+}
 
 function setupImageFallbacks() {
   function replaceWithPlaceholder(img) {
@@ -131,117 +153,117 @@ function setupImageFallbacks() {
   });
 }
 
-function setupCarousel(reduceMotion) {
-  const carousel = document.querySelector("[data-carousel]");
-  if (!carousel) return;
+function setupGallery() {
+  const grid = document.querySelector("[data-gallery]");
+  const images = CONFIG.galleryImages || [];
+  if (!grid || images.length === 0) return;
 
-  const track = carousel.querySelector("[data-carousel-track]");
-  const slides = Array.prototype.slice.call(
-    carousel.querySelectorAll(".carousel-slide")
-  );
-  const prevBtn = carousel.querySelector("[data-carousel-prev]");
-  const nextBtn = carousel.querySelector("[data-carousel-next]");
-  const dotsWrap = carousel.querySelector("[data-carousel-dots]");
-  if (!track || slides.length === 0) return;
+  // Build the responsive grid of clickable thumbnails.
+  images.forEach(function (file, i) {
+    const item = document.createElement("figure");
+    item.className = "gallery-item";
+    item.tabIndex = 0;
+    item.setAttribute("role", "button");
+    item.setAttribute("aria-label", "View photo " + (i + 1));
 
-  let index = 0;
-  let timer = null;
+    const img = document.createElement("img");
+    img.src = "images/" + file;
+    img.alt = "Magrim Repairs completed rim repair work";
+    img.loading = "lazy";
+    img.setAttribute("data-fallback", "Photo " + (i + 1));
+    item.appendChild(img);
 
-  // Build navigation dots.
-  const dots = slides.map(function (_, i) {
-    const dot = document.createElement("button");
-    dot.className = "carousel-dot";
-    dot.type = "button";
-    dot.setAttribute("aria-label", "Go to photo " + (i + 1));
-    dot.addEventListener("click", function () {
-      goTo(i);
-      restartAuto();
+    item.addEventListener("click", function () {
+      openLightbox(i);
     });
-    dotsWrap.appendChild(dot);
-    return dot;
+    item.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openLightbox(i);
+      }
+    });
+
+    grid.appendChild(item);
   });
 
-  function goTo(next) {
-    index = (next + slides.length) % slides.length;
-    track.style.transform = "translateX(-" + index * 100 + "%)";
-    dots.forEach(function (dot, i) {
-      dot.classList.toggle("active", i === index);
-    });
-  }
+  // ===== Lightbox =====
+  const lightbox = document.querySelector("[data-lightbox]");
+  if (!lightbox) return;
 
-  function startAuto() {
-    if (reduceMotion || slides.length < 2) return;
-    timer = window.setInterval(function () {
-      goTo(index + 1);
-    }, CONFIG.carouselInterval);
-  }
+  const lbImage = lightbox.querySelector("[data-lightbox-image]");
+  const lbPrev = lightbox.querySelector("[data-lightbox-prev]");
+  const lbNext = lightbox.querySelector("[data-lightbox-next]");
+  const lbClose = lightbox.querySelector("[data-lightbox-close]");
+  const lbCounter = lightbox.querySelector("[data-lightbox-counter]");
+  let current = 0;
 
-  function stopAuto() {
-    if (timer) {
-      window.clearInterval(timer);
-      timer = null;
+  function show(i) {
+    current = (i + images.length) % images.length;
+    lbImage.src = "images/" + images[current];
+    if (lbCounter) {
+      lbCounter.textContent = current + 1 + " / " + images.length;
     }
   }
 
-  function restartAuto() {
-    stopAuto();
-    startAuto();
+  function openLightbox(i) {
+    show(i);
+    lightbox.classList.add("open");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
   }
 
-  if (prevBtn) {
-    prevBtn.addEventListener("click", function () {
-      goTo(index - 1);
-      restartAuto();
-    });
-  }
-  if (nextBtn) {
-    nextBtn.addEventListener("click", function () {
-      goTo(index + 1);
-      restartAuto();
-    });
+  function closeLightbox() {
+    lightbox.classList.remove("open");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
   }
 
-  // Keyboard support.
-  carousel.addEventListener("keydown", function (e) {
-    if (e.key === "ArrowLeft") {
-      goTo(index - 1);
-      restartAuto();
-    } else if (e.key === "ArrowRight") {
-      goTo(index + 1);
-      restartAuto();
-    }
+  if (lbPrev) {
+    lbPrev.addEventListener("click", function () {
+      show(current - 1);
+    });
+  }
+  if (lbNext) {
+    lbNext.addEventListener("click", function () {
+      show(current + 1);
+    });
+  }
+  if (lbClose) lbClose.addEventListener("click", closeLightbox);
+
+  // Click on the dark backdrop (not the image) closes the viewer.
+  lightbox.addEventListener("click", function (e) {
+    if (e.target === lightbox) closeLightbox();
   });
 
-  // Pause auto-slide on hover (desktop).
-  carousel.addEventListener("mouseenter", stopAuto);
-  carousel.addEventListener("mouseleave", startAuto);
+  // Keyboard navigation.
+  document.addEventListener("keydown", function (e) {
+    if (!lightbox.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    else if (e.key === "ArrowLeft") show(current - 1);
+    else if (e.key === "ArrowRight") show(current + 1);
+  });
 
-  // Touch / swipe support for mobile.
+  // Swipe support on the lightbox image (mobile).
   let startX = 0;
   let dragging = false;
-  track.addEventListener(
+  lbImage.addEventListener(
     "touchstart",
     function (e) {
       startX = e.touches[0].clientX;
       dragging = true;
-      stopAuto();
     },
     { passive: true }
   );
-  track.addEventListener(
+  lbImage.addEventListener(
     "touchend",
     function (e) {
       if (!dragging) return;
       dragging = false;
       const deltaX = e.changedTouches[0].clientX - startX;
-      if (Math.abs(deltaX) > 40) {
-        goTo(index + (deltaX < 0 ? 1 : -1));
+      if (Math.abs(deltaX) > 45) {
+        show(current + (deltaX < 0 ? 1 : -1));
       }
-      restartAuto();
     },
     { passive: true }
   );
-
-  goTo(0);
-  startAuto();
 }

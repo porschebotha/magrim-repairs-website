@@ -45,9 +45,8 @@
 
   <main>
     <!-- ===== Hero ===== -->
-    <!-- The hero background image is set in styles.css (.hero) and loads from
-         images/hero.jpg. PLACEHOLDER: add a large professional automotive
-         workshop / alloy wheel photo at images/hero.jpg. -->
+    <!-- The hero background image is set in styles.css (.hero). To use a
+         different photo, change the background-image file name there. -->
     <section id="home" class="hero">
       <div class="hero-overlay" aria-hidden="true"></div>
       <div class="hero-glow" aria-hidden="true"></div>
@@ -168,74 +167,29 @@
       </div>
     </section>
 
-    <!-- ===== Gallery (carousel) ===== -->
-    <!-- PLACEHOLDER: add the job photos to the images/ folder using the file
-         names below (rim-1.jpg ... rim-5.jpg, car-1.jpg ... car-5.jpg).
-         Until then each slide shows a styled placeholder automatically. -->
+    <!-- ===== Gallery ===== -->
+    <!-- The gallery tiles are built by script.js from the image list in
+         CONFIG.galleryImages, using the photos in the images/ folder. -->
     <section id="gallery" class="section">
       <div class="container">
         <h2 class="section-title reveal">Our Recent Rim Repair Work</h2>
         <p class="section-intro reveal">
-          A look at completed alloy wheel repair and refurbishing jobs from the
-          Magrim Repairs workshop. Swipe or use the arrows to browse.
+          A look at completed alloy wheel repairs, refurbishing and
+          customization jobs from the Magrim Repairs workshop. Tap any photo to
+          view it larger.
         </p>
-
-        <div
-          class="carousel reveal"
-          data-carousel
-          aria-roledescription="carousel"
-          aria-label="Recent rim repair work"
-        >
-          <div class="carousel-viewport">
-            <div class="carousel-track" data-carousel-track>
-              <figure class="carousel-slide">
-                <img src="images/rim-1.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 1" />
-              </figure>
-              <figure class="carousel-slide">
-                <img src="images/rim-2.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 2" />
-              </figure>
-              <figure class="carousel-slide">
-                <img src="images/rim-3.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 3" />
-              </figure>
-              <figure class="carousel-slide">
-                <img src="images/rim-4.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 4" />
-              </figure>
-              <figure class="carousel-slide">
-                <img src="images/rim-5.jpg" alt="Completed alloy wheel repair" loading="lazy" data-fallback="Rim Photo 5" />
-              </figure>
-              <figure class="carousel-slide">
-                <img src="images/car-1.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 1" />
-              </figure>
-              <figure class="carousel-slide">
-                <img src="images/car-2.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 2" />
-              </figure>
-              <figure class="carousel-slide">
-                <img src="images/car-3.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 3" />
-              </figure>
-              <figure class="carousel-slide">
-                <img src="images/car-4.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 4" />
-              </figure>
-              <figure class="carousel-slide">
-                <img src="images/car-5.jpg" alt="Repaired alloy wheel fitted to a car" loading="lazy" data-fallback="Car Photo 5" />
-              </figure>
-            </div>
-          </div>
-
-          <button
-            class="carousel-arrow carousel-prev"
-            data-carousel-prev
-            aria-label="Previous photo"
-          >&#10094;</button>
-          <button
-            class="carousel-arrow carousel-next"
-            data-carousel-next
-            aria-label="Next photo"
-          >&#10095;</button>
-
-          <div class="carousel-dots" data-carousel-dots aria-label="Choose photo"></div>
-        </div>
+        <div class="gallery-grid reveal" data-gallery aria-label="Recent rim repair work"></div>
       </div>
     </section>
+
+    <!-- Lightbox overlay (built up by script.js) -->
+    <div class="lightbox" data-lightbox aria-hidden="true" role="dialog" aria-label="Photo viewer">
+      <button class="lightbox-close" data-lightbox-close aria-label="Close">&#10005;</button>
+      <button class="lightbox-arrow lightbox-prev" data-lightbox-prev aria-label="Previous photo">&#10094;</button>
+      <img class="lightbox-image" data-lightbox-image alt="Magrim Repairs work" />
+      <button class="lightbox-arrow lightbox-next" data-lightbox-next aria-label="Next photo">&#10095;</button>
+      <div class="lightbox-counter" data-lightbox-counter></div>
+    </div>
 
     <!-- ===== Reviews ===== -->
     <section id="reviews" class="section section-alt">
@@ -357,10 +311,8 @@
             </div>
           </div>
           <div class="contact-media reveal">
-            <!-- image-1: add the file at images/image-1.jpg. Until then a
-                 styled placeholder is shown automatically. -->
             <img
-              src="images/image-1.jpg"
+              src="images/image-1.png"
               alt="Magrim Repairs alloy wheel work"
               class="contact-image"
               loading="lazy"

@@ -1,26 +1,23 @@
 # Images folder
 
-Drop the Magrim Repairs photos into this folder using the exact file names
-below. The website references these names directly, so no code changes are
-needed once the files are added. Until a file exists, the site shows a styled
-placeholder in its place.
+This folder holds the Magrim Repairs photos used across the website.
 
-## Expected files
+## What is used where
 
-| File name      | Where it appears                                            |
-|----------------|-------------------------------------------------------------|
-| `hero.jpg`     | Large background image of the homepage hero section         |
-| `image-1.jpg`  | Photo in the "Get in Touch" / contact section               |
-| `rim-1.jpg` … `rim-5.jpg` | Gallery — "Our Recent Rim Repair Work"           |
-| `car-1.jpg` … `car-5.jpg` | Gallery — "Our Recent Rim Repair Work"           |
+| Image(s)                         | Where it appears                              |
+|-----------------------------------|-----------------------------------------------|
+| `car-8.JPG`                       | Homepage hero background (set in `styles.css`) |
+| `image-1.png`                     | "Get in Touch" / contact section               |
+| `car-*` and `rim-*`               | "Our Recent Rim Repair Work" gallery           |
+| `logo-1.jpg`, `logo-2.jpg`        | Not used yet — available for a header logo     |
 
-## Tips
+## Changing the gallery
 
-- `hero.jpg` works best as a wide, landscape photo (around 1920×1080) of an
-  automotive workshop or an alloy wheel being repaired.
-- Gallery photos look best in landscape (16:9 works well, but any size is
-  cropped to fit).
-- If you have a different number of gallery photos, add or remove the matching
-  `<figure class="carousel-slide">` blocks in `index.html`.
-- Optional: `logo.png` and `workshop.jpg` can also be added — see the
-  `PLACEHOLDER` comments in `index.html`.
+The gallery is built from the `CONFIG.galleryImages` list in `script.js`.
+Add or remove file names there to update the grid and lightbox — no other
+changes needed.
+
+## Changing the hero image
+
+Edit the `background-image` file name on the `.hero` rule in `styles.css`.
+A wide landscape photo works best.
