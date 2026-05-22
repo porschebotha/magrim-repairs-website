@@ -328,10 +328,13 @@ h1, h2, h3 {
 }
 
 .hero-inner {
-  max-width: 560px;
-  margin-right: auto;
   position: relative;
   z-index: 1;
+}
+.hero-content {
+  max-width: 560px;
+  margin-right: auto;
+  text-align: left;
 }
 
 .hero-bar {
