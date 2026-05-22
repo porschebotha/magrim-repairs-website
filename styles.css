@@ -299,8 +299,8 @@ h1, h2, h3 {
 .hero-bg {
   position: absolute;
   inset: 0;
-  /* Cinematic hero background — images/logo-4.png. */
-  background-image: url("images/logo-4.png");
+  /* Cinematic hero background — images/logo-6.png. */
+  background-image: url("images/logo-6.png");
   background-size: cover;
   background-position: 62% center;
   transform: scale(1.04);
