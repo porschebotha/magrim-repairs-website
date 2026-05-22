@@ -1,16 +1,21 @@
 /* =============================================================
    Magrim Repairs - site configuration
-   PLACEHOLDER: replace the values below with your real details.
+   PLACEHOLDER: update the Facebook URL below with your real page.
    ============================================================= */
 const CONFIG = {
-  // Enter your WhatsApp number in international format, digits only.
-  // Namibia country code is 264. Example: "264811234567"
-  whatsappNumber: "264000000000",
+  // WhatsApp number in international format, digits only.
+  whatsappNumber: "264811241463",
 
   // The message that is pre-filled when a customer taps a WhatsApp button.
   prefilledMessage:
-    "Hello Magrim Repairs, I would like help with my car rim. " +
-    "Here is a photo of the damage:",
+    "Hello Magrim Repairs, I would like a quote. " +
+    "Here are photos of my damaged rims:",
+
+  // PLACEHOLDER: replace with the real Magrim Repairs Facebook Page URL.
+  facebookUrl: "https://www.facebook.com/",
+
+  // Gallery carousel auto-slide interval, in milliseconds.
+  carouselInterval: 4500,
 };
 
 /* ------------------------------------------------------------- */
@@ -29,13 +34,10 @@ document.addEventListener("DOMContentLoaded", function () {
     el.setAttribute("rel", "noopener");
   });
 
-  // Show the readable number in the contact section (if still a placeholder
-  // it just stays as the default text).
-  if (CONFIG.whatsappNumber && CONFIG.whatsappNumber !== "264000000000") {
-    document.querySelectorAll("[data-whatsapp-number]").forEach(function (el) {
-      el.textContent = "+" + CONFIG.whatsappNumber;
-    });
-  }
+  // Apply the Facebook Page link.
+  document.querySelectorAll("[data-facebook]").forEach(function (el) {
+    el.setAttribute("href", CONFIG.facebookUrl);
+  });
 
   // Current year in the footer.
   const yearEl = document.querySelector("[data-year]");
@@ -67,12 +69,12 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
-  // Scroll-reveal animations: stagger elements in as they enter the viewport.
-  const revealEls = document.querySelectorAll(".reveal");
   const reduceMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   ).matches;
 
+  // Scroll-reveal animations: stagger elements in as they enter the viewport.
+  const revealEls = document.querySelectorAll(".reveal");
   if (reduceMotion || !("IntersectionObserver" in window)) {
     revealEls.forEach(function (el) {
       el.classList.add("is-visible");
@@ -98,4 +100,122 @@ document.addEventListener("DOMContentLoaded", function () {
       observer.observe(el);
     });
   }
+
+  // ===== Gallery carousel =====
+  setupCarousel(reduceMotion);
 });
+
+function setupCarousel(reduceMotion) {
+  const carousel = document.querySelector("[data-carousel]");
+  if (!carousel) return;
+
+  const track = carousel.querySelector("[data-carousel-track]");
+  const slides = Array.prototype.slice.call(
+    carousel.querySelectorAll(".carousel-slide")
+  );
+  const prevBtn = carousel.querySelector("[data-carousel-prev]");
+  const nextBtn = carousel.querySelector("[data-carousel-next]");
+  const dotsWrap = carousel.querySelector("[data-carousel-dots]");
+  if (!track || slides.length === 0) return;
+
+  let index = 0;
+  let timer = null;
+
+  // Build navigation dots.
+  const dots = slides.map(function (_, i) {
+    const dot = document.createElement("button");
+    dot.className = "carousel-dot";
+    dot.type = "button";
+    dot.setAttribute("aria-label", "Go to photo " + (i + 1));
+    dot.addEventListener("click", function () {
+      goTo(i);
+      restartAuto();
+    });
+    dotsWrap.appendChild(dot);
+    return dot;
+  });
+
+  function goTo(next) {
+    index = (next + slides.length) % slides.length;
+    track.style.transform = "translateX(-" + index * 100 + "%)";
+    dots.forEach(function (dot, i) {
+      dot.classList.toggle("active", i === index);
+    });
+  }
+
+  function startAuto() {
+    if (reduceMotion || slides.length < 2) return;
+    timer = window.setInterval(function () {
+      goTo(index + 1);
+    }, CONFIG.carouselInterval);
+  }
+
+  function stopAuto() {
+    if (timer) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  function restartAuto() {
+    stopAuto();
+    startAuto();
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", function () {
+      goTo(index - 1);
+      restartAuto();
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function () {
+      goTo(index + 1);
+      restartAuto();
+    });
+  }
+
+  // Keyboard support.
+  carousel.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") {
+      goTo(index - 1);
+      restartAuto();
+    } else if (e.key === "ArrowRight") {
+      goTo(index + 1);
+      restartAuto();
+    }
+  });
+
+  // Pause auto-slide on hover (desktop).
+  carousel.addEventListener("mouseenter", stopAuto);
+  carousel.addEventListener("mouseleave", startAuto);
+
+  // Touch / swipe support for mobile.
+  let startX = 0;
+  let dragging = false;
+  track.addEventListener(
+    "touchstart",
+    function (e) {
+      startX = e.touches[0].clientX;
+      dragging = true;
+      stopAuto();
+    },
+    { passive: true }
+  );
+  track.addEventListener(
+    "touchend",
+    function (e) {
+      if (!dragging) return;
+      dragging = false;
+      const deltaX = e.changedTouches[0].clientX - startX;
+      if (Math.abs(deltaX) > 40) {
+        goTo(index + (deltaX < 0 ? 1 : -1));
+      }
+      restartAuto();
+    },
+    { passive: true }
+  );
+
+  goTo(0);
+  startAuto();
+}

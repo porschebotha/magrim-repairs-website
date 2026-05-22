@@ -1,7 +1,7 @@
 # Magrim Repairs Website
 
-A modern, mobile-friendly one-page website for **Magrim Repairs** — a car rim
-repair business in Windhoek, Namibia.
+A modern, mobile-friendly one-page website for **Magrim Repairs** — an alloy
+wheel repair specialist in Windhoek, Namibia.
 
 ## Run it
 
@@ -21,16 +21,20 @@ It is a plain static site — no build step needed.
 
 ## Sections
 
-Hero, About, Services, Work Gallery, Before & After, Customer Reviews, a
-call-to-action banner, and Contact — plus a floating WhatsApp button.
+Hero, About, Services, a swipeable photo gallery carousel, Customer Reviews,
+a call-to-action banner, and Contact — plus a floating WhatsApp button.
 
 ## Things to customise
 
-1. **WhatsApp number** — edit `CONFIG.whatsappNumber` in `script.js`
-   (international format, digits only, e.g. `264811234567`).
+1. **Facebook Page** — edit `CONFIG.facebookUrl` in `script.js` with the
+   real Magrim Repairs Facebook Page URL.
 2. **Logo** — replace the text logo in `index.html` (look for the
    `PLACEHOLDER` comment near `.brand`) with an `<img>` tag.
 3. **Photos** — replace the `.media-placeholder` boxes in `index.html`
-   with real `<img>` tags. They appear in the About, Gallery,
-   Before & After, and Contact sections. Search the file for
+   with real `<img>` tags. They appear in the About section, the Gallery
+   carousel (6 job photos), and the Contact section. Search the file for
    `PLACEHOLDER` to find each spot.
+
+The WhatsApp number, phone, email and address are already set to the real
+Magrim Repairs details (`+264 81 124 1463`, `marius@magrimrepairs.com`,
+225 Copper Street, Prosperita, Windhoek).
