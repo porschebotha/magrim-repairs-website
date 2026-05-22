@@ -16,23 +16,11 @@ const CONFIG = {
 
   // Gallery photos for "Our Recent Rim Repair Work". File names refer to
   // images in the images/ folder. Add or remove entries to update the
-  // gallery — the grid and lightbox rebuild automatically.
+  // slideshow — it rebuilds automatically.
   galleryImages: [
     "car-1.JPG", "car-2.JPG", "car-3.JPG", "car-4.JPG", "car-5.JPG",
     "car-6.JPG", "car-7.JPG", "car-8.JPG", "car-9.JPG", "car-10.JPG",
     "car-11.jpg", "car-12.jpg", "car-13.jpg", "car-14.jpg",
-    "rim-1.JPG", "rim-2.JPG", "rim-3.JPG", "rim-4.JPG", "rim-5.JPG",
-    "rim-6.JPG", "rim-7.JPG", "rim-8.JPG", "rim-9.JPG", "rim-10.JPG",
-    "rim-11.JPG", "rim-12.JPG", "rim-13.JPG", "rim-14.JPG", "rim-15.JPG",
-    "rim-16.JPG", "rim-17.JPG", "rim-18.JPG", "rim-19.JPG", "rim-20.JPG",
-    "rim-21.JPG", "rim-22.JPG", "rim-23.JPG", "rim-24.JPG", "rim-26.JPG",
-    "rim-27.JPG", "rim-28.JPG", "rim-29.JPG", "rim-30.JPG", "rim-31.JPG",
-    "rim-32.jpg", "rim-33.jpg", "rim-34.jpg", "rim-35.jpg", "rim-36.JPG",
-    "rim-37.jpg", "rim-38.JPG", "rim-39.JPG", "rim-40.JPG", "rim-41.JPG",
-    "rim-42.JPG", "rim-43.JPG", "rim-44.JPG", "rim-45.JPG", "rim-46.JPG",
-    "rim-47.JPG", "rim-48.JPG", "rim-49.JPG", "rim-50.JPG", "rim-51.JPG",
-    "rim-52.JPG", "rim-53.JPG", "rim-54.JPG", "rim-55.JPG", "rim-56.JPG",
-    "rim-57.JPG", "rim-58.JPG", "rim-59.JPG", "rim-278.JPG",
   ],
 };
 
