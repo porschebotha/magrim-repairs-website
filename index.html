@@ -326,13 +326,16 @@
                   <button type="button" class="rating-star" data-value="4" aria-label="4 stars">&#9733;</button>
                   <button type="button" class="rating-star" data-value="5" aria-label="5 stars">&#9733;</button>
                 </div>
+                <!-- The star buttons set this hidden field, which is what
+                     gets sent to Formspree. -->
+                <input type="hidden" name="rating" data-rating-value />
               </div>
             </div>
             <div class="form-field">
               <label class="form-label" for="review-comment">Your Review</label>
               <textarea
                 id="review-comment"
-                name="comment"
+                name="message"
                 class="form-input form-textarea"
                 rows="4"
                 maxlength="400"
@@ -340,11 +343,12 @@
                 required
               ></textarea>
             </div>
-            <!-- Honeypot: hidden anti-spam field. Real visitors never see
-                 or fill it; bots that do are silently rejected. -->
+            <!-- Honeypot: hidden anti-spam field. Real visitors never see or
+                 fill it; bots that do are rejected. Formspree also treats a
+                 field named "_gotcha" as a spam trap automatically. -->
             <div class="hp-field" aria-hidden="true">
               <label>Leave this field empty
-                <input type="text" name="company" data-hp tabindex="-1" autocomplete="off" />
+                <input type="text" name="_gotcha" data-hp tabindex="-1" autocomplete="off" />
               </label>
             </div>
             <div class="form-footer">
@@ -447,11 +451,6 @@
     <span class="whatsapp-float-text">Chat with us</span>
   </a>
 
-  <!-- Firebase (compat SDK) — powers the customer reviews backend.
-       If FIREBASE_CONFIG in script.js still has placeholder values,
-       reviews fall back to being saved in the visitor's own browser. -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

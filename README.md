@@ -44,71 +44,50 @@ The WhatsApp number, phone, email and address are already set to the real
 Magrim Repairs details (`+264 81 124 1463`, `marius@magrimrepairs.com`,
 225 Copper Street, Prosperita, Windhoek).
 
-## Firebase setup (customer reviews)
+## Formspree setup (customer reviews)
 
-The customer reviews section can store reviews permanently in **Firebase
-Firestore** so they are shared with every visitor. Until Firebase is set up,
-the form still works but saves reviews only in each visitor's own browser.
+The customer review form sends each submission to **Formspree**, which emails
+it to the business and lists it in the Formspree dashboard. Until Formspree is
+set up, the form still works and shows the review on the visitor's own device,
+but nothing is emailed.
 
 Follow these steps once — no coding required:
 
-1. **Create a project**
-   - Go to <https://console.firebase.google.com/> and sign in with a Google
-     account.
-   - Click **Add project**, name it (e.g. `magrim-repairs`), and finish the
-     wizard. Google Analytics is optional.
+1. **Create a Formspree account**
+   - Go to <https://formspree.io/> and sign up (the free plan is enough for a
+     small business).
+   - Use the business email `marius@magrimrepairs.com` so review emails arrive
+     in the right inbox.
 
-2. **Register a Web app**
-   - On the project overview page, click the **`</>` (Web)** icon.
-   - Give it a nickname (e.g. `Magrim website`) and click **Register app**.
-   - Firebase shows a `firebaseConfig` object — keep this page open.
+2. **Create a form**
+   - Click **+ New form**, name it e.g. `Magrim Reviews`.
+   - Confirm the email address that should receive the reviews.
 
-3. **Create the Firestore database**
-   - In the left menu choose **Build → Firestore Database → Create database**.
-   - Start in **Production mode** and pick a location close to Namibia
-     (e.g. `europe-west1`).
+3. **Copy the form endpoint URL**
+   - Formspree shows an endpoint that looks like
+     `https://formspree.io/f/abcdefgh`.
 
-4. **Add the security rules**
-   - Open the Firestore **Rules** tab, replace everything with the rules
-     below, and click **Publish**. They allow anyone to read reviews and to
-     submit a *valid* review, but never to edit or delete:
+4. **Paste the endpoint into the site**
+   - Open `script.js` and find the `FORMSPREE_ENDPOINT` line near the top
+     (just under the `FORMSPREE CONFIGURATION` comment block).
+   - Replace the whole `https://formspree.io/f/YOUR_FORM_ID` placeholder with
+     your real endpoint URL.
+   - Commit and push — GitHub Pages redeploys and review submissions are now
+     emailed to the business.
 
-   ```
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /reviews/{id} {
-         allow read: if true;
-         allow create: if request.resource.data.name is string
-           && request.resource.data.name.size() >= 2
-           && request.resource.data.name.size() <= 60
-           && request.resource.data.comment is string
-           && request.resource.data.comment.size() >= 4
-           && request.resource.data.comment.size() <= 400
-           && request.resource.data.rating is number
-           && request.resource.data.rating >= 1
-           && request.resource.data.rating <= 5;
-         allow update, delete: if false;
-       }
-     }
-   }
-   ```
+5. **First submission**
+   - Formspree asks you to confirm the form the first time it receives a
+     submission. Submit one test review and click the confirmation link in the
+     email Formspree sends you.
 
-5. **Paste the config into the site**
-   - Open `script.js` and find the `FIREBASE_CONFIG` block near the top.
-   - Replace each `YOUR_...` placeholder with the matching value from the
-     `firebaseConfig` shown in step 2.
-   - Commit and push — GitHub Pages will redeploy and reviews now save to
-     Firestore and appear instantly for everyone.
+What the form sends to Formspree: the **customer name**, **star rating** and
+**review message**.
 
-6. **Allow your domain** (if reviews do not load)
-   - In **Firestore/Authentication settings → Authorized domains**, make sure
-     `porschebotha.github.io` is listed (it usually is by default).
+Built-in spam protection: a hidden honeypot field (`_gotcha`, which Formspree
+also recognises), a 30-second cooldown between submissions on the same device,
+and length validation on every field.
 
-**Is it safe to commit the Firebase config?** Yes. Firebase web config values
-are designed to be public — security is enforced by the Firestore rules above,
-not by hiding the keys. The free Firebase "Spark" plan is enough for a small
-business review section.
-
-Built-in spam protection: a hidden honeypot field, a 30-second cooldown
-between submissions, length limits, and the server-side Firestore rules.
+Note: Formspree delivers reviews to the business inbox/dashboard — it does not
+publish them back onto the site automatically. The three example review cards
+are part of `index.html`; to feature a real review, copy one of those cards
+and edit its name, stars and text.

@@ -25,33 +25,25 @@ const CONFIG = {
 };
 
 /* =============================================================
-   FIREBASE CONFIGURATION  (customer reviews backend)
+   FORMSPREE CONFIGURATION  (customer reviews)
    -------------------------------------------------------------
-   Paste your Firebase project's web config below. To find it:
-     1. Go to  https://console.firebase.google.com/
-     2. Create a project (or open an existing one).
-     3. Add a Web app:  Project Overview -> the "</>" web icon.
-     4. Open  Project settings (gear icon) -> "General" tab.
-     5. Under "Your apps" -> "SDK setup and configuration",
-        choose "Config" and copy each value here.
+   The review form sends each submission to Formspree, which
+   emails it to the business and lists it in the Formspree
+   dashboard. To set it up:
 
-   NOTE: these values are NOT secret. Firebase web config is
-   meant to be public and safe to commit to GitHub. Your data is
-   protected by Firestore SECURITY RULES, not by hiding these
-   keys. See the "Firebase setup" section in README.md.
+     1. Go to  https://formspree.io/  and create a free account
+        using the business email (marius@magrimrepairs.com).
+     2. Click "+ New form", name it e.g. "Magrim Reviews", and
+        confirm the email address that should receive reviews.
+     3. Formspree gives you a form endpoint URL that looks like:
+            https://formspree.io/f/abcdefgh
+     4. PASTE THAT URL between the quotes below, replacing the
+        whole "https://formspree.io/f/YOUR_FORM_ID" placeholder.
 
-   Until real values replace the "YOUR_..." placeholders below,
-   the reviews form keeps working but saves reviews only in the
-   visitor's own browser (localStorage fallback).
+   Until a real endpoint is set, the form still works and shows
+   the review on this device, but nothing is emailed.
    ============================================================= */
-const FIREBASE_CONFIG = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-};
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
 
 /* ------------------------------------------------------------- */
 
@@ -392,7 +384,8 @@ function setupReviews(reduceMotion) {
     : [];
   const messageEl = form.querySelector("[data-form-message]");
   const nameInput = form.querySelector('[name="name"]');
-  const commentInput = form.querySelector('[name="comment"]');
+  const commentInput = form.querySelector('[name="message"]');
+  const ratingValueInput = form.querySelector("[data-rating-value]");
   const honeypot = form.querySelector("[data-hp]");
   const submitBtn = form.querySelector('button[type="submit"]');
   let rating = 0;
@@ -410,6 +403,9 @@ function setupReviews(reduceMotion) {
   function setRating(value) {
     rating = value;
     paintStars(value);
+    if (ratingValueInput) {
+      ratingValueInput.value = value ? value + " out of 5" : "";
+    }
   }
   stars.forEach(function (star) {
     const value = parseInt(star.getAttribute("data-value"), 10);
@@ -567,188 +563,122 @@ function setupReviews(reduceMotion) {
     showMessage("Thank you! Your review has been posted.", "success");
   }
 
-  /* =========================================================
-     Backend: Firebase Firestore when configured (see
-     FIREBASE_CONFIG at the top of this file), otherwise the
-     review is saved only in the visitor's own browser.
-     ========================================================= */
-  const firebaseReady =
-    typeof firebase !== "undefined" &&
-    typeof FIREBASE_CONFIG === "object" &&
-    typeof FIREBASE_CONFIG.apiKey === "string" &&
-    FIREBASE_CONFIG.apiKey.indexOf("YOUR_") !== 0;
-
-  if (firebaseReady && setupFirestoreBackend()) {
-    return;
-  }
-  setupLocalBackend();
-
-  /* ----- Firebase Firestore backend (permanent, shared storage) ----- */
-  function setupFirestoreBackend() {
-    let db;
+  /* ----- This visitor's own submitted reviews (kept in the browser
+     so they still see their feedback after a page reload) ----- */
+  function readStored() {
     try {
-      if (!firebase.apps || !firebase.apps.length) {
-        firebase.initializeApp(FIREBASE_CONFIG);
-      }
-      db = firebase.firestore();
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
-      return false; // fall back to local storage
+      return [];
     }
-
-    const collection = db.collection("reviews");
-    const seenIds = {};
-    let dynamicCards = [];
-
-    // Live listener: any review added to Firestore (by anyone) shows
-    // up immediately, without a page reload.
-    collection.onSnapshot(
-      function (snapshot) {
-        const items = [];
-        snapshot.forEach(function (doc) {
-          const d = doc.data() || {};
-          let date = null;
-          if (d.createdAt && typeof d.createdAt.toDate === "function") {
-            date = d.createdAt.toDate();
-          }
-          items.push({
-            id: doc.id,
-            name: String(d.name || ""),
-            rating: Number(d.rating) || 0,
-            comment: String(d.comment || ""),
-            date: date,
-          });
-        });
-        // Newest first; a review still awaiting its server timestamp
-        // sorts to the very top.
-        items.sort(function (a, b) {
-          const ta = a.date ? a.date.getTime() : Infinity;
-          const tb = b.date ? b.date.getTime() : Infinity;
-          return tb - ta;
-        });
-
-        dynamicCards.forEach(function (c) {
-          c.remove();
-        });
-        dynamicCards = [];
-        items.forEach(function (item) {
-          const isNew = !seenIds[item.id];
-          seenIds[item.id] = true;
-          const card = buildCard({
-            name: item.name,
-            rating: item.rating,
-            comment: item.comment,
-            dateLabel: item.date ? formatDate(item.date) : "Just now",
-          });
-          grid.insertBefore(card, firstSeedCard);
-          dynamicCards.push(card);
-          revealCard(card, isNew);
-        });
-      },
-      function () {
-        showMessage(
-          "Reviews could not load right now. Please try again later.",
-          "error"
-        );
-      }
-    );
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const result = validateSubmission();
-      if (!result.ok) {
-        handleInvalid(result);
-        return;
-      }
-      if (submitBtn) submitBtn.disabled = true;
-      showMessage("Posting your review…", "success");
-
-      collection
-        .add({
-          name: result.name,
-          rating: result.rating,
-          comment: result.comment,
-          // Date submitted — set by Firebase's servers.
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        })
-        .then(function () {
-          afterSuccess();
-        })
-        .catch(function () {
-          showMessage(
-            "Sorry, your review could not be saved. Please try again.",
-            "error"
-          );
-        })
-        .then(function () {
-          if (submitBtn) submitBtn.disabled = false;
-        });
-    });
-
-    return true;
+  }
+  function writeStored(list) {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      /* storage unavailable — the review still shows for this visit */
+    }
   }
 
-  /* ----- Browser-only fallback (used when Firebase is not set up) ----- */
-  function setupLocalBackend() {
-    function readStored() {
-      try {
-        const raw = window.localStorage.getItem(STORAGE_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
-      } catch (e) {
-        return [];
-      }
-    }
-    function writeStored(list) {
-      try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-      } catch (e) {
-        /* storage unavailable — the review still shows for this visit */
-      }
-    }
-
-    readStored().forEach(function (review) {
-      grid.insertBefore(
-        buildCard({
-          name: review.name,
-          rating: review.rating,
-          comment: review.comment,
-          dateLabel: review.date
-            ? formatDate(new Date(review.date))
-            : "Customer review",
-        }),
-        firstSeedCard
-      );
-    });
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const result = validateSubmission();
-      if (!result.ok) {
-        handleInvalid(result);
-        return;
-      }
-
-      const review = {
-        name: result.name,
-        rating: result.rating,
-        comment: result.comment,
-        date: new Date().toISOString(),
-      };
-      const list = readStored();
-      list.push(review);
-      writeStored(list);
-
-      const card = buildCard({
+  readStored().forEach(function (review) {
+    grid.insertBefore(
+      buildCard({
         name: review.name,
         rating: review.rating,
         comment: review.comment,
-        dateLabel: formatDate(new Date(review.date)),
-      });
-      grid.insertBefore(card, firstSeedCard);
-      revealCard(card, true);
+        dateLabel: review.date
+          ? formatDate(new Date(review.date))
+          : "Customer review",
+      }),
+      firstSeedCard
+    );
+  });
 
-      afterSuccess();
-      card.scrollIntoView({ behavior: "smooth", block: "center" });
+  function completeSubmission(review) {
+    const list = readStored();
+    list.push(review);
+    writeStored(list);
+
+    const card = buildCard({
+      name: review.name,
+      rating: review.rating,
+      comment: review.comment,
+      dateLabel: formatDate(new Date(review.date)),
     });
+    grid.insertBefore(card, firstSeedCard);
+    revealCard(card, true);
+
+    afterSuccess();
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
   }
+
+  /* =========================================================
+     Submission: send the review to Formspree (see
+     FORMSPREE_ENDPOINT at the top of this file). Formspree
+     emails each review to the business and lists it in the
+     Formspree dashboard. The review card is also shown on this
+     device so the visitor sees their feedback straight away.
+     ========================================================= */
+  const formspreeReady =
+    typeof FORMSPREE_ENDPOINT === "string" &&
+    FORMSPREE_ENDPOINT.indexOf("formspree.io/f/") !== -1 &&
+    FORMSPREE_ENDPOINT.indexOf("YOUR_FORM_ID") === -1;
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const result = validateSubmission();
+    if (!result.ok) {
+      handleInvalid(result);
+      return;
+    }
+
+    const review = {
+      name: result.name,
+      rating: result.rating,
+      comment: result.comment,
+      date: new Date().toISOString(),
+    };
+
+    // If Formspree is not set up yet, still record the review locally
+    // so the form keeps working.
+    if (!formspreeReady) {
+      completeSubmission(review);
+      return;
+    }
+
+    if (submitBtn) submitBtn.disabled = true;
+    showMessage("Sending your review…", "success");
+
+    // Send the name, star rating and review message to Formspree.
+    const data = new FormData(form);
+    data.set("rating", result.rating + " out of 5 stars");
+    data.set("_subject", "New review from the Magrim Repairs website");
+
+    fetch(FORMSPREE_ENDPOINT, {
+      method: "POST",
+      body: data,
+      headers: { Accept: "application/json" },
+    })
+      .then(function (response) {
+        if (response.ok) {
+          completeSubmission(review);
+        } else {
+          showMessage(
+            "Sorry, your review could not be sent. Please try again.",
+            "error"
+          );
+        }
+      })
+      .catch(function () {
+        showMessage(
+          "Network error — please check your connection and try again.",
+          "error"
+        );
+      })
+      .then(function () {
+        if (submitBtn) submitBtn.disabled = false;
+      });
+  });
 }
