@@ -63,15 +63,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Mobile navigation toggle.
   const toggle = document.querySelector(".nav-toggle");
-  const links = document.querySelector(".nav-links");
-  if (toggle && links) {
+  const menu = document.querySelector(".nav-menu");
+  if (toggle && menu) {
     toggle.addEventListener("click", function () {
-      const open = links.classList.toggle("open");
+      const open = menu.classList.toggle("open");
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
-    links.querySelectorAll("a").forEach(function (a) {
+    menu.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", function () {
-        links.classList.remove("open");
+        menu.classList.remove("open");
         toggle.setAttribute("aria-expanded", "false");
       });
     });
