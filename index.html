@@ -24,9 +24,6 @@
   <header class="site-header">
     <nav class="nav container">
       <a href="#home" class="brand">
-        <!-- PLACEHOLDER: replace this text with your logo image, e.g.
-             <img src="images/logo.png" alt="Magrim Repairs" class="logo" /> -->
-        <span class="brand-mark">M</span>
         <span class="brand-name">Magrim Repairs</span>
       </a>
       <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
@@ -115,9 +112,13 @@
             </ul>
           </div>
           <div class="about-media reveal">
-            <!-- PLACEHOLDER: replace with a real workshop / repair photo, e.g.
-                 <img src="images/workshop.jpg" alt="Magrim Repairs workshop" /> -->
-            <div class="media-placeholder">Your photo here</div>
+            <img
+              src="images/logo-2.png"
+              alt="Magrim Repairs"
+              class="about-image"
+              loading="lazy"
+              data-fallback="Magrim Repairs"
+            />
           </div>
         </div>
       </div>
@@ -168,17 +169,33 @@
     </section>
 
     <!-- ===== Gallery ===== -->
-    <!-- The gallery tiles are built by script.js from the image list in
+    <!-- The slideshow tiles are built by script.js from the image list in
          CONFIG.galleryImages, using the photos in the images/ folder. -->
     <section id="gallery" class="section">
       <div class="container">
         <h2 class="section-title reveal">Our Recent Rim Repair Work</h2>
         <p class="section-intro reveal">
           A look at completed alloy wheel repairs, refurbishing and
-          customization jobs from the Magrim Repairs workshop. Tap any photo to
-          view it larger.
+          customization jobs from the Magrim Repairs workshop. Use the arrows
+          to browse, and tap any photo to view it larger.
         </p>
-        <div class="gallery-grid reveal" data-gallery aria-label="Recent rim repair work"></div>
+        <div class="gallery-carousel reveal" data-gallery-carousel>
+          <button
+            class="gallery-arrow gallery-prev"
+            data-gallery-prev
+            aria-label="Previous photos"
+          >&#10094;</button>
+          <div
+            class="gallery-viewport"
+            data-gallery-track
+            aria-label="Recent rim repair work"
+          ></div>
+          <button
+            class="gallery-arrow gallery-next"
+            data-gallery-next
+            aria-label="Next photos"
+          >&#10095;</button>
+        </div>
       </div>
     </section>
 

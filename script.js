@@ -91,12 +91,11 @@ document.addEventListener("DOMContentLoaded", function () {
     "(prefers-reduced-motion: reduce)"
   ).matches;
 
-  // ===== Gallery (build the grid before observing reveal elements) =====
+  // ===== Gallery slideshow =====
   setupGallery();
 
   // Scroll-reveal animations: stagger elements in as they enter the viewport.
   setupReveal(reduceMotion, ".reveal", 90);
-  setupReveal(reduceMotion, ".gallery-item", 45);
 
   // ===== Image fallbacks =====
   // Show a styled placeholder in place of any image that fails to load.
@@ -154,11 +153,11 @@ function setupImageFallbacks() {
 }
 
 function setupGallery() {
-  const grid = document.querySelector("[data-gallery]");
+  const track = document.querySelector("[data-gallery-track]");
   const images = CONFIG.galleryImages || [];
-  if (!grid || images.length === 0) return;
+  if (!track || images.length === 0) return;
 
-  // Build the responsive grid of clickable thumbnails.
+  // Build the horizontal slideshow of clickable thumbnails.
   images.forEach(function (file, i) {
     const item = document.createElement("figure");
     item.className = "gallery-item";
@@ -183,8 +182,48 @@ function setupGallery() {
       }
     });
 
-    grid.appendChild(item);
+    track.appendChild(item);
   });
+
+  // ===== Slideshow arrows =====
+  const carousel = document.querySelector("[data-gallery-carousel]");
+  const prevArrow = carousel
+    ? carousel.querySelector("[data-gallery-prev]")
+    : null;
+  const nextArrow = carousel
+    ? carousel.querySelector("[data-gallery-next]")
+    : null;
+
+  function updateArrows() {
+    if (!prevArrow || !nextArrow) return;
+    const maxScroll = track.scrollWidth - track.clientWidth - 2;
+    prevArrow.disabled = track.scrollLeft <= 2;
+    nextArrow.disabled = track.scrollLeft >= maxScroll;
+  }
+
+  function pageBy(direction) {
+    // Scroll by roughly one viewport, snapped to whole items.
+    const item = track.querySelector(".gallery-item");
+    const step = item
+      ? item.getBoundingClientRect().width + 16
+      : track.clientWidth;
+    const perPage = Math.max(1, Math.floor(track.clientWidth / step));
+    track.scrollBy({ left: direction * perPage * step, behavior: "smooth" });
+  }
+
+  if (prevArrow) {
+    prevArrow.addEventListener("click", function () {
+      pageBy(-1);
+    });
+  }
+  if (nextArrow) {
+    nextArrow.addEventListener("click", function () {
+      pageBy(1);
+    });
+  }
+  track.addEventListener("scroll", updateArrows, { passive: true });
+  window.addEventListener("resize", updateArrows, { passive: true });
+  updateArrows();
 
   // ===== Lightbox =====
   const lightbox = document.querySelector("[data-lightbox]");

@@ -8,8 +8,9 @@ This folder holds the Magrim Repairs photos used across the website.
 |-----------------------------------|-----------------------------------------------|
 | `car-8.JPG`                       | Homepage hero background (set in `styles.css`) |
 | `image-1.png`                     | "Get in Touch" / contact section               |
-| `car-*` and `rim-*`               | "Our Recent Rim Repair Work" gallery           |
-| `logo-1.jpg`, `logo-2.jpg`        | Not used yet — available for a header logo     |
+| `logo-2.png`                      | "About Magrim Repairs" section                  |
+| `car-*` and `rim-*`               | "Our Recent Rim Repair Work" slideshow         |
+| `logo-1.jpg`, `logo-2.jpg`        | Not used — available for a header logo         |
 
 ## Changing the gallery
 
