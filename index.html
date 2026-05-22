@@ -340,6 +340,13 @@
                 required
               ></textarea>
             </div>
+            <!-- Honeypot: hidden anti-spam field. Real visitors never see
+                 or fill it; bots that do are silently rejected. -->
+            <div class="hp-field" aria-hidden="true">
+              <label>Leave this field empty
+                <input type="text" name="company" data-hp tabindex="-1" autocomplete="off" />
+              </label>
+            </div>
             <div class="form-footer">
               <button type="submit" class="btn btn-whatsapp">Submit Review</button>
               <p class="form-message" data-form-message role="status" aria-live="polite"></p>
@@ -440,6 +447,11 @@
     <span class="whatsapp-float-text">Chat with us</span>
   </a>
 
+  <!-- Firebase (compat SDK) — powers the customer reviews backend.
+       If FIREBASE_CONFIG in script.js still has placeholder values,
+       reviews fall back to being saved in the visitor's own browser. -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

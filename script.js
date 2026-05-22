@@ -24,6 +24,35 @@ const CONFIG = {
   ],
 };
 
+/* =============================================================
+   FIREBASE CONFIGURATION  (customer reviews backend)
+   -------------------------------------------------------------
+   Paste your Firebase project's web config below. To find it:
+     1. Go to  https://console.firebase.google.com/
+     2. Create a project (or open an existing one).
+     3. Add a Web app:  Project Overview -> the "</>" web icon.
+     4. Open  Project settings (gear icon) -> "General" tab.
+     5. Under "Your apps" -> "SDK setup and configuration",
+        choose "Config" and copy each value here.
+
+   NOTE: these values are NOT secret. Firebase web config is
+   meant to be public and safe to commit to GitHub. Your data is
+   protected by Firestore SECURITY RULES, not by hiding these
+   keys. See the "Firebase setup" section in README.md.
+
+   Until real values replace the "YOUR_..." placeholders below,
+   the reviews form keeps working but saves reviews only in the
+   visitor's own browser (localStorage fallback).
+   ============================================================= */
+const FIREBASE_CONFIG = {
+  apiKey: "YOUR_FIREBASE_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
+};
+
 /* ------------------------------------------------------------- */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -354,6 +383,9 @@ function setupReviews(reduceMotion) {
   if (!grid || !form) return;
 
   const STORAGE_KEY = "magrim-reviews";
+  const LAST_SUBMIT_KEY = "magrim-last-review";
+  const SUBMIT_COOLDOWN = 30000; // anti-spam: 30s between submissions
+
   const ratingInput = form.querySelector("[data-rating-input]");
   const stars = ratingInput
     ? Array.prototype.slice.call(ratingInput.querySelectorAll(".rating-star"))
@@ -361,25 +393,15 @@ function setupReviews(reduceMotion) {
   const messageEl = form.querySelector("[data-form-message]");
   const nameInput = form.querySelector('[name="name"]');
   const commentInput = form.querySelector('[name="comment"]');
+  const honeypot = form.querySelector("[data-hp]");
+  const submitBtn = form.querySelector('button[type="submit"]');
   let rating = 0;
 
-  function readStored() {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      return [];
-    }
-  }
-  function writeStored(list) {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    } catch (e) {
-      /* storage unavailable — the review still shows for this visit */
-    }
-  }
+  // Reviews submitted by visitors are inserted ahead of this first
+  // built-in (seed) review card.
+  const firstSeedCard = grid.querySelector(".review-card");
 
+  /* ----- Star rating input ----- */
   function paintStars(value) {
     stars.forEach(function (star, i) {
       star.classList.toggle("is-active", i < value);
@@ -389,7 +411,6 @@ function setupReviews(reduceMotion) {
     rating = value;
     paintStars(value);
   }
-
   stars.forEach(function (star) {
     const value = parseInt(star.getAttribute("data-value"), 10);
     star.addEventListener("click", function () {
@@ -405,7 +426,21 @@ function setupReviews(reduceMotion) {
     });
   }
 
+  /* ----- Card rendering ----- */
+  function formatDate(date) {
+    try {
+      return date.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+    } catch (e) {
+      return "";
+    }
+  }
+
   function buildCard(review) {
+    // review: { name, rating, comment, dateLabel }
     const card = document.createElement("article");
     card.className = "review-card reveal";
 
@@ -434,7 +469,7 @@ function setupReviews(reduceMotion) {
     strong.textContent = review.name;
     const metaSpan = document.createElement("span");
     metaSpan.className = "reviewer-meta";
-    metaSpan.textContent = "Customer review";
+    metaSpan.textContent = review.dateLabel || "Customer review";
     meta.appendChild(strong);
     meta.appendChild(metaSpan);
     reviewer.appendChild(avatar);
@@ -446,45 +481,8 @@ function setupReviews(reduceMotion) {
     return card;
   }
 
-  // Render any reviews saved in this browser, newest first.
-  readStored().forEach(function (review) {
-    grid.insertBefore(buildCard(review), grid.firstChild);
-  });
-
-  function showMessage(text, type) {
-    if (!messageEl) return;
-    messageEl.textContent = text;
-    messageEl.className = "form-message is-" + type;
-  }
-
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    const name = nameInput.value.trim();
-    const comment = commentInput.value.trim();
-
-    if (!name) {
-      showMessage("Please enter your name.", "error");
-      nameInput.focus();
-      return;
-    }
-    if (rating < 1) {
-      showMessage("Please select a star rating.", "error");
-      return;
-    }
-    if (comment.length < 4) {
-      showMessage("Please write a short review.", "error");
-      commentInput.focus();
-      return;
-    }
-
-    const review = { name: name, rating: rating, comment: comment };
-    const list = readStored();
-    list.push(review);
-    writeStored(list);
-
-    const card = buildCard(review);
-    grid.insertBefore(card, grid.firstChild);
-    if (reduceMotion) {
+  function revealCard(card, animate) {
+    if (reduceMotion || !animate) {
       card.classList.add("is-visible");
     } else {
       window.requestAnimationFrame(function () {
@@ -493,10 +491,264 @@ function setupReviews(reduceMotion) {
         });
       });
     }
+  }
 
+  function showMessage(text, type) {
+    if (!messageEl) return;
+    messageEl.textContent = text;
+    messageEl.className = "form-message is-" + type;
+  }
+
+  /* ----- Validation + basic spam protection ----- */
+  function validateSubmission() {
+    // Honeypot: a hidden field that real visitors never fill.
+    if (honeypot && honeypot.value.trim() !== "") {
+      return { ok: false, silent: true };
+    }
+    // Cooldown: block rapid repeat submissions from the same browser.
+    try {
+      const last = parseInt(
+        window.localStorage.getItem(LAST_SUBMIT_KEY) || "0",
+        10
+      );
+      if (last && Date.now() - last < SUBMIT_COOLDOWN) {
+        return {
+          ok: false,
+          message: "Please wait a moment before submitting another review.",
+        };
+      }
+    } catch (e) {
+      /* localStorage unavailable — skip the cooldown check */
+    }
+
+    const name = nameInput.value.trim();
+    const comment = commentInput.value.trim();
+    if (name.length < 2) {
+      return { ok: false, message: "Please enter your name.", focus: nameInput };
+    }
+    if (name.length > 60) {
+      return { ok: false, message: "That name is too long.", focus: nameInput };
+    }
+    if (rating < 1 || rating > 5) {
+      return { ok: false, message: "Please select a star rating." };
+    }
+    if (comment.length < 4) {
+      return {
+        ok: false,
+        message: "Please write a short review.",
+        focus: commentInput,
+      };
+    }
+    if (comment.length > 400) {
+      return {
+        ok: false,
+        message: "That review is too long (max 400 characters).",
+        focus: commentInput,
+      };
+    }
+    return { ok: true, name: name, rating: rating, comment: comment };
+  }
+
+  function handleInvalid(result) {
+    if (!result.silent && result.message) {
+      showMessage(result.message, "error");
+      if (result.focus) result.focus.focus();
+    }
+  }
+
+  function afterSuccess() {
     form.reset();
     setRating(0);
-    showMessage("Thank you! Your review has been added.", "success");
-    card.scrollIntoView({ behavior: "smooth", block: "center" });
-  });
+    try {
+      window.localStorage.setItem(LAST_SUBMIT_KEY, String(Date.now()));
+    } catch (e) {
+      /* ignore */
+    }
+    showMessage("Thank you! Your review has been posted.", "success");
+  }
+
+  /* =========================================================
+     Backend: Firebase Firestore when configured (see
+     FIREBASE_CONFIG at the top of this file), otherwise the
+     review is saved only in the visitor's own browser.
+     ========================================================= */
+  const firebaseReady =
+    typeof firebase !== "undefined" &&
+    typeof FIREBASE_CONFIG === "object" &&
+    typeof FIREBASE_CONFIG.apiKey === "string" &&
+    FIREBASE_CONFIG.apiKey.indexOf("YOUR_") !== 0;
+
+  if (firebaseReady && setupFirestoreBackend()) {
+    return;
+  }
+  setupLocalBackend();
+
+  /* ----- Firebase Firestore backend (permanent, shared storage) ----- */
+  function setupFirestoreBackend() {
+    let db;
+    try {
+      if (!firebase.apps || !firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+      }
+      db = firebase.firestore();
+    } catch (e) {
+      return false; // fall back to local storage
+    }
+
+    const collection = db.collection("reviews");
+    const seenIds = {};
+    let dynamicCards = [];
+
+    // Live listener: any review added to Firestore (by anyone) shows
+    // up immediately, without a page reload.
+    collection.onSnapshot(
+      function (snapshot) {
+        const items = [];
+        snapshot.forEach(function (doc) {
+          const d = doc.data() || {};
+          let date = null;
+          if (d.createdAt && typeof d.createdAt.toDate === "function") {
+            date = d.createdAt.toDate();
+          }
+          items.push({
+            id: doc.id,
+            name: String(d.name || ""),
+            rating: Number(d.rating) || 0,
+            comment: String(d.comment || ""),
+            date: date,
+          });
+        });
+        // Newest first; a review still awaiting its server timestamp
+        // sorts to the very top.
+        items.sort(function (a, b) {
+          const ta = a.date ? a.date.getTime() : Infinity;
+          const tb = b.date ? b.date.getTime() : Infinity;
+          return tb - ta;
+        });
+
+        dynamicCards.forEach(function (c) {
+          c.remove();
+        });
+        dynamicCards = [];
+        items.forEach(function (item) {
+          const isNew = !seenIds[item.id];
+          seenIds[item.id] = true;
+          const card = buildCard({
+            name: item.name,
+            rating: item.rating,
+            comment: item.comment,
+            dateLabel: item.date ? formatDate(item.date) : "Just now",
+          });
+          grid.insertBefore(card, firstSeedCard);
+          dynamicCards.push(card);
+          revealCard(card, isNew);
+        });
+      },
+      function () {
+        showMessage(
+          "Reviews could not load right now. Please try again later.",
+          "error"
+        );
+      }
+    );
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const result = validateSubmission();
+      if (!result.ok) {
+        handleInvalid(result);
+        return;
+      }
+      if (submitBtn) submitBtn.disabled = true;
+      showMessage("Posting your review…", "success");
+
+      collection
+        .add({
+          name: result.name,
+          rating: result.rating,
+          comment: result.comment,
+          // Date submitted — set by Firebase's servers.
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(function () {
+          afterSuccess();
+        })
+        .catch(function () {
+          showMessage(
+            "Sorry, your review could not be saved. Please try again.",
+            "error"
+          );
+        })
+        .then(function () {
+          if (submitBtn) submitBtn.disabled = false;
+        });
+    });
+
+    return true;
+  }
+
+  /* ----- Browser-only fallback (used when Firebase is not set up) ----- */
+  function setupLocalBackend() {
+    function readStored() {
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    function writeStored(list) {
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {
+        /* storage unavailable — the review still shows for this visit */
+      }
+    }
+
+    readStored().forEach(function (review) {
+      grid.insertBefore(
+        buildCard({
+          name: review.name,
+          rating: review.rating,
+          comment: review.comment,
+          dateLabel: review.date
+            ? formatDate(new Date(review.date))
+            : "Customer review",
+        }),
+        firstSeedCard
+      );
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const result = validateSubmission();
+      if (!result.ok) {
+        handleInvalid(result);
+        return;
+      }
+
+      const review = {
+        name: result.name,
+        rating: result.rating,
+        comment: result.comment,
+        date: new Date().toISOString(),
+      };
+      const list = readStored();
+      list.push(review);
+      writeStored(list);
+
+      const card = buildCard({
+        name: review.name,
+        rating: review.rating,
+        comment: review.comment,
+        dateLabel: formatDate(new Date(review.date)),
+      });
+      grid.insertBefore(card, firstSeedCard);
+      revealCard(card, true);
+
+      afterSuccess();
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
 }
