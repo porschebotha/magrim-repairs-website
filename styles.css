@@ -158,16 +158,22 @@ h1, h2, h3 {
   height: 76px;
 }
 
-.brand { display: flex; align-items: center; }
-.brand-name {
-  font-family: "Sora", sans-serif;
-  font-weight: 800;
-  font-size: 1.3rem;
-  color: var(--white);
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+.brand {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
-.brand-accent { color: var(--red-bright); margin-left: 0.25rem; }
+.brand-logo {
+  height: 62px;
+  width: auto;
+  display: block;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.28s ease;
+}
+.brand:hover .brand-logo {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 10px rgba(255, 34, 51, 0.65));
+}
 
 .nav-menu {
   display: flex;
@@ -926,6 +932,7 @@ h1, h2, h3 {
   .section { padding: 4rem 0; }
   .hero-stats { gap: 1.6rem; }
   .stat-num { font-size: 1.6rem; }
+  .brand-logo { height: 48px; }
   .nav-cta-text { display: none; }
   .nav-cta { padding: 0.7rem 0.85rem; }
   .nav-cta .wa-icon { font-size: 1.3rem; }
