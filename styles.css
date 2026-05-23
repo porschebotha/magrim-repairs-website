@@ -1,15 +1,13 @@
 /* ===== Design tokens ===== */
-/* Brighter automotive theme: red, white and charcoal/black.
-   Light content sections with white cards, dark charcoal header,
-   hero, CTA banner and footer for contrast. */
+/* Dark automotive theme: red, white and black/charcoal. */
 :root {
-  /* Light surfaces */
-  --bg: #ffffff;
-  --bg-soft: #eceef1;
-  --card: #ffffff;
-  --card-soft: #f4f5f7;
+  /* Surfaces (dark) */
+  --bg: #0a0a0b;
+  --bg-soft: #101012;
+  --card: #161618;
+  --card-soft: #1f1f22;
 
-  /* Dark surfaces (charcoal, not pure black) */
+  /* Charcoal — used by header, hero, CTA banner and footer */
   --charcoal: #1c1d21;
   --charcoal-2: #26272c;
   --charcoal-deep: #161719;
@@ -21,23 +19,24 @@
 
   --white: #ffffff;
 
-  /* Text */
-  --ink: #1b1c20;
-  --ink-soft: #55575e;
+  /* Text on dark cards / sections */
+  --ink: #ecedef;
+  --ink-soft: #b6b8bd;
   --ink-faint: #82848b;
+  /* Text on the charcoal hero / CTA / footer */
   --on-dark: #eceef0;
   --on-dark-soft: #b4b6bd;
 
   /* Lines */
-  --line: #e2e4e8;
+  --line: #2a2a2e;
   --line-dark: #34353b;
 
   --radius: 14px;
   --radius-lg: 20px;
   --maxw: 1180px;
-  --shadow-card: 0 6px 24px -14px rgba(20, 22, 28, 0.28);
-  --shadow-lift: 0 24px 48px -22px rgba(20, 22, 28, 0.34);
-  --shadow-red: 0 22px 46px -20px rgba(236, 27, 42, 0.42);
+  --shadow-card: 0 14px 32px -18px rgba(0, 0, 0, 0.8);
+  --shadow-lift: 0 28px 56px -22px rgba(0, 0, 0, 0.85);
+  --shadow-red: 0 22px 46px -20px rgba(236, 27, 42, 0.55);
 }
 
 /* ===== Base ===== */
@@ -310,16 +309,16 @@ h1, h2, h3 {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(1000px 700px at 72% 38%, rgba(236, 27, 42, 0.2), transparent 62%),
-    linear-gradient(98deg, rgba(16, 17, 19, 0.9) 0%, rgba(16, 17, 19, 0.62) 40%, rgba(16, 17, 19, 0.28) 72%, rgba(16, 17, 19, 0.08) 100%),
-    linear-gradient(180deg, rgba(16, 17, 19, 0.4) 0%, transparent 34%, rgba(16, 17, 19, 0.8) 100%);
+    radial-gradient(1000px 700px at 72% 38%, rgba(236, 27, 42, 0.22), transparent 62%),
+    linear-gradient(98deg, rgba(8, 8, 9, 0.97) 0%, rgba(8, 8, 9, 0.82) 38%, rgba(8, 8, 9, 0.42) 72%, rgba(8, 8, 9, 0.25) 100%),
+    linear-gradient(180deg, rgba(8, 8, 9, 0.55) 0%, transparent 32%, rgba(8, 8, 9, 0.94) 100%);
   pointer-events: none;
 }
 .hero-overlay::after {
   content: "";
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 220px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 0 240px 70px rgba(0, 0, 0, 0.88);
 }
 
 @keyframes heroZoom {
@@ -868,7 +867,7 @@ h1, h2, h3 {
 
 /* Star rendering */
 .stars .star-on { color: var(--red); }
-.stars .star-off { color: var(--line); }
+.stars .star-off { color: var(--ink-faint); }
 
 /* ===== Review submission form ===== */
 .review-form-card {
@@ -934,7 +933,7 @@ h1, h2, h3 {
   cursor: pointer;
   font-size: 1.9rem;
   line-height: 1;
-  color: var(--line);
+  color: var(--ink-faint);
   transition: color 0.15s ease, transform 0.15s ease;
 }
 .rating-star:hover { transform: scale(1.15); }
@@ -952,7 +951,7 @@ h1, h2, h3 {
   margin: 0;
 }
 .form-message.is-error { color: var(--red); }
-.form-message.is-success { color: #1d9b4b; }
+.form-message.is-success { color: #2ee06f; }
 
 /* Honeypot anti-spam field — visually hidden but still in the DOM. */
 .hp-field {
