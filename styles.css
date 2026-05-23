@@ -1064,6 +1064,98 @@ h1, h2, h3 {
   box-shadow: var(--shadow-lift);
 }
 
+/* ===== Our Location ===== */
+.location-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 2.8rem;
+  margin-top: 1.6rem;
+  align-items: stretch;
+}
+.location-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  padding: 2rem 2rem 1.8rem;
+  background: linear-gradient(160deg, var(--card), var(--bg-soft));
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--red);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.location-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.location-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--red);
+  color: var(--white);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  box-shadow: 0 10px 24px -12px rgba(236, 27, 42, 0.8);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.location-row:hover .location-icon {
+  transform: scale(1.08);
+  box-shadow: 0 12px 28px -10px rgba(255, 46, 60, 0.95);
+}
+.location-label {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 0.2rem;
+}
+.location-text {
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.location-link {
+  color: var(--ink);
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  transition: color 0.18s ease;
+}
+.location-link:hover { color: var(--red-bright); }
+
+.location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.6rem;
+}
+.loc-btn-icon { font-size: 1.1rem; line-height: 1; }
+
+.location-map {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lift);
+  min-height: 380px;
+  background: var(--card);
+}
+.location-map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  border: 0;
+  filter: grayscale(0.15) contrast(1.02);
+  transition: filter 0.4s ease;
+}
+.location-map:hover iframe { filter: none; }
+
 /* ===== Footer ===== */
 .site-footer {
   background: var(--charcoal-deep);
@@ -1141,7 +1233,10 @@ h1, h2, h3 {
   }
 
   .about-grid,
-  .contact-grid { grid-template-columns: 1fr; }
+  .contact-grid,
+  .location-grid { grid-template-columns: 1fr; }
+  .location-map,
+  .location-map iframe { min-height: 320px; }
 }
 
 @media (max-width: 600px) {
