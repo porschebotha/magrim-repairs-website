@@ -131,6 +131,19 @@ h1, h2, h3 {
 
 .btn-lg { padding: 1.1rem 2.3rem; font-size: 1.08rem; }
 
+/* Solid charcoal button — pairs as a secondary action on light cards. */
+.btn-dark {
+  background: var(--charcoal);
+  color: var(--white);
+  border: 1px solid var(--charcoal);
+}
+.btn-dark:hover {
+  background: var(--charcoal-2);
+  border-color: var(--charcoal-2);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
+}
+
 /* Facebook button — a charcoal/black accent on light cards. */
 .btn-facebook {
   background: var(--charcoal);
