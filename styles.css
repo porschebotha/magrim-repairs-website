@@ -326,46 +326,30 @@ h1, h2, h3 {
 .hero-bg {
   position: absolute;
   inset: 0;
-  /* Cinematic hero background — images/logo-10.png (Magrim showroom). */
+  /* Hero background — images/logo-10.png (Magrim showroom). Static, no
+     scale or animation, so the workshop, vehicles, logo and wheels are
+     all visible at first paint. */
   background-image: url("images/logo-10.png");
   background-size: cover;
-  background-position: center 38%;
+  background-position: center 30%;
   background-color: var(--charcoal-deep);
   background-repeat: no-repeat;
-  transform: scale(1.04);
-  animation: heroZoom 24s ease-in-out infinite alternate;
-}
-/* On narrower / portrait screens, show the whole image (no crop) so the
-   logo, Porsches, wheels and welding worker all stay visible. */
-@media (max-width: 980px) {
-  .hero-bg {
-    background-size: contain;
-    background-position: center top;
-    transform: none;
-    animation: none;
-  }
 }
 .hero-overlay {
   position: absolute;
   inset: 0;
-  /* Light overlay — just enough darkening to keep text readable while the
-     full image (logo, cars, wheels, welder) remains clearly visible. */
+  /* Light overlay — keeps the headline readable on the left without
+     darkening the right side of the image. */
   background:
-    radial-gradient(900px 600px at 72% 38%, rgba(236, 27, 42, 0.14), transparent 62%),
-    linear-gradient(98deg, rgba(8, 8, 9, 0.65) 0%, rgba(8, 8, 9, 0.35) 42%, rgba(8, 8, 9, 0.1) 75%, rgba(8, 8, 9, 0) 100%),
-    linear-gradient(180deg, rgba(8, 8, 9, 0.2) 0%, transparent 34%, rgba(8, 8, 9, 0.55) 100%);
+    linear-gradient(98deg, rgba(8, 8, 9, 0.55) 0%, rgba(8, 8, 9, 0.25) 45%, rgba(8, 8, 9, 0) 80%),
+    linear-gradient(180deg, rgba(8, 8, 9, 0.1) 0%, transparent 30%, rgba(8, 8, 9, 0.4) 100%);
   pointer-events: none;
 }
 .hero-overlay::after {
   content: "";
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 160px 30px rgba(0, 0, 0, 0.4);
-}
-
-@keyframes heroZoom {
-  from { transform: scale(1.04); }
-  to { transform: scale(1.14); }
+  box-shadow: inset 0 0 140px 24px rgba(0, 0, 0, 0.32);
 }
 
 .hero-inner {
@@ -501,7 +485,6 @@ h1, h2, h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-bg { animation: none; }
   .hero-reveal { opacity: 1; transform: none; animation: none; }
   .hero-scroll-arrow { animation: none; }
 }
