@@ -141,10 +141,10 @@ described.
 
 ```
 Eyebrow (small uppercase, silver):     ABOUT MAGRIM REPAIRS
-Heading (H2, white):                   Two decades of alloy wheel craftsmanship
+Heading (H2, white):                   Over 25 years of alloy wheel craftsmanship
 Body (light grey):                     Magrim Repairs is a well-established alloy wheel specialist based in Windhoek, Namibia. We offer expert repairs, customisation and refurbishment for all makes of alloy wheels.
 
-With over twenty years of experience, we have built a reputation for honest advice and professional workmanship. We service passenger cars, motorcycles and quad bikes — bringing damaged, buckled and scuffed wheels back to life.
+With over 25 years of experience, we have built a reputation for honest advice and professional workmanship. We service passenger cars, motorcycles and quad bikes — bringing damaged, buckled and scuffed wheels back to life.
 
 For quotes and inquiries you can speak directly to Marius, who will guide you through the best repair option.
 ```
@@ -153,7 +153,7 @@ For quotes and inquiries you can speak directly to Marius, who will guide you th
 
 Use 4 **Blurb Modules** (Image/Icon = Divi icon, no graphic), titles only:
 
-1. **20+ years of alloy wheel experience**
+1. **25+ years of alloy wheel experience**
 2. **Repairs, customisation and refurbishment under one roof**
 3. **Honest advice — talk directly to Marius**
 4. **Friendly, professional local service**
@@ -551,7 +551,7 @@ affect the others) but you can re-import them anywhere.
    test a real submission.
 8. Add SEO meta (Yoast or Rank Math): title `Magrim Repairs — Alloy
    Wheel Repairs in Windhoek`, description `Specialist alloy wheel
-   repair and refurbishment in Prosperita, Windhoek. Over 20 years of
+   repair and refurbishment in Prosperita, Windhoek. Over 25 years of
    experience. Send photos on WhatsApp for a quote.`
 9. Launch.
 
