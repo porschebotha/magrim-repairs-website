@@ -326,8 +326,8 @@ h1, h2, h3 {
 .hero-bg {
   position: absolute;
   inset: 0;
-  /* Cinematic hero background — images/logo-9.png (Magrim showroom). */
-  background-image: url("images/logo-9.png");
+  /* Cinematic hero background — images/logo-10.png (Magrim showroom). */
+  background-image: url("images/logo-10.png");
   background-size: cover;
   background-position: center 38%;
   background-color: var(--charcoal-deep);
