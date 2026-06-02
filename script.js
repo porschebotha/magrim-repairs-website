@@ -14,13 +14,10 @@ const CONFIG = {
   // PLACEHOLDER: replace with the real Magrim Repairs Facebook Page URL.
   facebookUrl: "https://www.facebook.com/",
 
-  // Gallery photos for "Our Recent Rim Repair Work". File names refer to
-  // images in the images/ folder and are case-sensitive on GitHub Pages.
-  // Add or remove entries to update the gallery — it rebuilds automatically.
+  // Gallery photos for "Our Recent Rim Repair Work". Only the rim-*
+  // images are listed here. File names are case-sensitive on GitHub
+  // Pages and must match what is in the images/ folder exactly.
   galleryImages: [
-    "car-1.JPG", "car-2.JPG", "car-3.JPG", "car-4.JPG", "car-5.JPG",
-    "car-6.JPG", "car-7.JPG", "car-8.JPG", "car-9.JPG", "car-10.JPG",
-    "car-11.jpg", "car-12.jpg", "car-13.jpg", "car-14.jpg",
     "rim-1.JPG", "rim-2.JPG", "rim-3.JPG", "rim-4.JPG", "rim-5.JPG",
     "rim-6.JPG", "rim-7.JPG", "rim-8.JPG", "rim-9.JPG", "rim-10.JPG",
     "rim-11.JPG", "rim-12.JPG", "rim-13.JPG", "rim-14.JPG", "rim-15.JPG",
@@ -153,37 +150,127 @@ function setupImageFallbacks() {
 }
 
 function setupGallery(reduceMotion) {
-  const grid = document.querySelector("[data-gallery]");
+  const track = document.querySelector("[data-slideshow-track]");
   const images = CONFIG.galleryImages || [];
-  if (!grid || images.length === 0) return;
+  if (!track || images.length === 0) return;
 
-  // Build the responsive grid of clickable thumbnails.
+  const slideshow = document.querySelector("[data-slideshow]");
+  const prevArrow = document.querySelector("[data-slideshow-prev]");
+  const nextArrow = document.querySelector("[data-slideshow-next]");
+  const counter = document.querySelector("[data-slideshow-counter]");
+
+  let index = 0;
+  let timer = null;
+
+  // Build one full-width slide per image. Click/tap opens the lightbox.
   images.forEach(function (file, i) {
-    const item = document.createElement("figure");
-    item.className = "gallery-item";
-    item.tabIndex = 0;
-    item.setAttribute("role", "button");
-    item.setAttribute("aria-label", "View photo " + (i + 1) + " full screen");
+    const slide = document.createElement("figure");
+    slide.className = "slideshow-slide";
+    slide.tabIndex = 0;
+    slide.setAttribute("role", "button");
+    slide.setAttribute("aria-label", "View photo " + (i + 1) + " full screen");
 
     const img = document.createElement("img");
     img.src = "images/" + file;
     img.alt = "Magrim Repairs completed rim repair work";
-    img.loading = i < 6 ? "eager" : "lazy";
+    img.loading = i < 2 ? "eager" : "lazy";
     img.setAttribute("data-fallback", "Photo " + (i + 1));
-    item.appendChild(img);
+    slide.appendChild(img);
 
-    item.addEventListener("click", function () {
+    slide.addEventListener("click", function () {
       openLightbox(i);
     });
-    item.addEventListener("keydown", function (e) {
+    slide.addEventListener("keydown", function (e) {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         openLightbox(i);
       }
     });
 
-    grid.appendChild(item);
+    track.appendChild(slide);
   });
+
+  function goTo(i) {
+    index = (i + images.length) % images.length;
+    track.style.transform = "translateX(-" + index * 100 + "%)";
+    if (counter) counter.textContent = index + 1 + " / " + images.length;
+  }
+
+  function startAuto() {
+    if (reduceMotion || images.length < 2) return;
+    timer = window.setInterval(function () {
+      goTo(index + 1);
+    }, 5000);
+  }
+  function stopAuto() {
+    if (timer) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  }
+  function restartAuto() {
+    stopAuto();
+    startAuto();
+  }
+
+  if (prevArrow) {
+    prevArrow.addEventListener("click", function () {
+      goTo(index - 1);
+      restartAuto();
+    });
+  }
+  if (nextArrow) {
+    nextArrow.addEventListener("click", function () {
+      goTo(index + 1);
+      restartAuto();
+    });
+  }
+
+  if (slideshow) {
+    // Pause auto-advance while the visitor is interacting.
+    slideshow.addEventListener("mouseenter", stopAuto);
+    slideshow.addEventListener("mouseleave", startAuto);
+    slideshow.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") {
+        goTo(index - 1);
+        restartAuto();
+      } else if (e.key === "ArrowRight") {
+        goTo(index + 1);
+        restartAuto();
+      }
+    });
+  }
+
+  // Touch swipe support for mobile.
+  let swipeX = 0;
+  let swiping = false;
+  track.addEventListener(
+    "touchstart",
+    function (e) {
+      swipeX = e.touches[0].clientX;
+      swiping = true;
+      stopAuto();
+    },
+    { passive: true }
+  );
+  track.addEventListener(
+    "touchend",
+    function (e) {
+      if (!swiping) return;
+      swiping = false;
+      const dx = e.changedTouches[0].clientX - swipeX;
+      if (Math.abs(dx) > 45) goTo(index + (dx < 0 ? 1 : -1));
+      restartAuto();
+    },
+    { passive: true }
+  );
+
+  window.addEventListener("resize", function () {
+    track.style.transform = "translateX(-" + index * 100 + "%)";
+  });
+
+  goTo(0);
+  startAuto();
 
   // ===== Lightbox =====
   const lightbox = document.querySelector("[data-lightbox]");
