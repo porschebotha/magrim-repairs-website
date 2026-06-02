@@ -348,17 +348,19 @@ h1, h2, h3 {
 .hero-overlay {
   position: absolute;
   inset: 0;
+  /* Light overlay — just enough darkening to keep text readable while the
+     full image (logo, cars, wheels, welder) remains clearly visible. */
   background:
-    radial-gradient(1000px 700px at 72% 38%, rgba(236, 27, 42, 0.2), transparent 62%),
-    linear-gradient(98deg, rgba(16, 17, 19, 0.9) 0%, rgba(16, 17, 19, 0.62) 40%, rgba(16, 17, 19, 0.28) 72%, rgba(16, 17, 19, 0.08) 100%),
-    linear-gradient(180deg, rgba(16, 17, 19, 0.4) 0%, transparent 34%, rgba(16, 17, 19, 0.8) 100%);
+    radial-gradient(900px 600px at 72% 38%, rgba(236, 27, 42, 0.14), transparent 62%),
+    linear-gradient(98deg, rgba(8, 8, 9, 0.65) 0%, rgba(8, 8, 9, 0.35) 42%, rgba(8, 8, 9, 0.1) 75%, rgba(8, 8, 9, 0) 100%),
+    linear-gradient(180deg, rgba(8, 8, 9, 0.2) 0%, transparent 34%, rgba(8, 8, 9, 0.55) 100%);
   pointer-events: none;
 }
 .hero-overlay::after {
   content: "";
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 220px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 0 160px 30px rgba(0, 0, 0, 0.4);
 }
 
 @keyframes heroZoom {
