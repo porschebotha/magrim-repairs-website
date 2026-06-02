@@ -91,6 +91,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Gallery grid + lightbox =====
   setupGallery(reduceMotion);
 
+  // ===== Customer reviews carousel =====
+  setupReviewsCarousel(reduceMotion);
+
   // Scroll-reveal animations: stagger elements in as they enter the viewport.
   setupReveal(reduceMotion, ".reveal", 90);
 
@@ -354,3 +357,121 @@ function setupGallery(reduceMotion) {
   );
 }
 
+
+function setupReviewsCarousel(reduceMotion) {
+  const carousel = document.querySelector("[data-reviews-carousel]");
+  if (!carousel) return;
+
+  const track = carousel.querySelector("[data-reviews-track]");
+  const slides = Array.prototype.slice.call(
+    carousel.querySelectorAll(".review-slide")
+  );
+  const prevArrow = carousel.querySelector("[data-reviews-prev]");
+  const nextArrow = carousel.querySelector("[data-reviews-next]");
+  const dotsWrap = carousel.querySelector("[data-reviews-dots]");
+  if (!track || slides.length === 0) return;
+
+  let index = 0;
+  let timer = null;
+  const AUTO_MS = 6000;
+
+  function goTo(i) {
+    index = (i + slides.length) % slides.length;
+    track.style.transform = "translateX(-" + index * 100 + "%)";
+    if (dotsWrap) {
+      dotsWrap.querySelectorAll(".reviews-dot").forEach(function (d, n) {
+        d.classList.toggle("active", n === index);
+        d.setAttribute("aria-current", n === index ? "true" : "false");
+      });
+    }
+  }
+
+  function startAuto() {
+    if (reduceMotion || slides.length < 2) return;
+    timer = window.setInterval(function () {
+      goTo(index + 1);
+    }, AUTO_MS);
+  }
+  function stopAuto() {
+    if (timer) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  }
+  function restartAuto() {
+    stopAuto();
+    startAuto();
+  }
+
+  // Build navigation dots — one per slide.
+  if (dotsWrap) {
+    slides.forEach(function (_, i) {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "reviews-dot";
+      dot.setAttribute("aria-label", "Go to review " + (i + 1));
+      dot.addEventListener("click", function () {
+        goTo(i);
+        restartAuto();
+      });
+      dotsWrap.appendChild(dot);
+    });
+  }
+
+  if (prevArrow) {
+    prevArrow.addEventListener("click", function () {
+      goTo(index - 1);
+      restartAuto();
+    });
+  }
+  if (nextArrow) {
+    nextArrow.addEventListener("click", function () {
+      goTo(index + 1);
+      restartAuto();
+    });
+  }
+
+  // Pause auto-rotate while the visitor is interacting.
+  carousel.addEventListener("mouseenter", stopAuto);
+  carousel.addEventListener("mouseleave", startAuto);
+  carousel.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") {
+      goTo(index - 1);
+      restartAuto();
+    } else if (e.key === "ArrowRight") {
+      goTo(index + 1);
+      restartAuto();
+    }
+  });
+
+  // Touch swipe.
+  let swipeX = 0;
+  let swiping = false;
+  track.addEventListener(
+    "touchstart",
+    function (e) {
+      swipeX = e.touches[0].clientX;
+      swiping = true;
+      stopAuto();
+    },
+    { passive: true }
+  );
+  track.addEventListener(
+    "touchend",
+    function (e) {
+      if (!swiping) return;
+      swiping = false;
+      const dx = e.changedTouches[0].clientX - swipeX;
+      if (Math.abs(dx) > 45) goTo(index + (dx < 0 ? 1 : -1));
+      restartAuto();
+    },
+    { passive: true }
+  );
+
+  window.addEventListener("resize", function () {
+    track.style.transform = "translateX(-" + index * 100 + "%)";
+  });
+
+  goTo(0);
+  startAuto();
+}
