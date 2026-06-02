@@ -15,12 +15,24 @@ const CONFIG = {
   facebookUrl: "https://www.facebook.com/",
 
   // Gallery photos for "Our Recent Rim Repair Work". File names refer to
-  // images in the images/ folder. Add or remove entries to update the
-  // slideshow — it rebuilds automatically.
+  // images in the images/ folder and are case-sensitive on GitHub Pages.
+  // Add or remove entries to update the gallery — it rebuilds automatically.
   galleryImages: [
     "car-1.JPG", "car-2.JPG", "car-3.JPG", "car-4.JPG", "car-5.JPG",
     "car-6.JPG", "car-7.JPG", "car-8.JPG", "car-9.JPG", "car-10.JPG",
     "car-11.jpg", "car-12.jpg", "car-13.jpg", "car-14.jpg",
+    "rim-1.JPG", "rim-2.JPG", "rim-3.JPG", "rim-4.JPG", "rim-5.JPG",
+    "rim-6.JPG", "rim-7.JPG", "rim-8.JPG", "rim-9.JPG", "rim-10.JPG",
+    "rim-11.JPG", "rim-12.JPG", "rim-13.JPG", "rim-14.JPG", "rim-15.JPG",
+    "rim-16.JPG", "rim-17.JPG", "rim-18.JPG", "rim-19.JPG", "rim-20.JPG",
+    "rim-21.JPG", "rim-22.JPG", "rim-23.JPG", "rim-24.JPG", "rim-26.JPG",
+    "rim-27.JPG", "rim-28.JPG", "rim-29.JPG", "rim-30.JPG", "rim-31.JPG",
+    "rim-32.jpg", "rim-33.jpg", "rim-34.jpg", "rim-35.jpg", "rim-36.JPG",
+    "rim-37.jpg", "rim-38.JPG", "rim-39.JPG", "rim-40.JPG", "rim-41.JPG",
+    "rim-42.JPG", "rim-43.JPG", "rim-44.JPG", "rim-45.JPG", "rim-46.JPG",
+    "rim-47.JPG", "rim-48.JPG", "rim-49.JPG", "rim-50.JPG", "rim-51.JPG",
+    "rim-52.JPG", "rim-53.JPG", "rim-54.JPG", "rim-55.JPG", "rim-56.JPG",
+    "rim-57.JPG", "rim-58.JPG", "rim-59.JPG", "rim-278.JPG",
   ],
 };
 
@@ -79,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
     "(prefers-reduced-motion: reduce)"
   ).matches;
 
-  // ===== Gallery slideshow =====
+  // ===== Gallery grid + lightbox =====
   setupGallery(reduceMotion);
 
   // Scroll-reveal animations: stagger elements in as they enter the viewport.
@@ -141,127 +153,37 @@ function setupImageFallbacks() {
 }
 
 function setupGallery(reduceMotion) {
-  const track = document.querySelector("[data-slideshow-track]");
+  const grid = document.querySelector("[data-gallery]");
   const images = CONFIG.galleryImages || [];
-  if (!track || images.length === 0) return;
+  if (!grid || images.length === 0) return;
 
-  const slideshow = document.querySelector("[data-slideshow]");
-  const prevArrow = document.querySelector("[data-slideshow-prev]");
-  const nextArrow = document.querySelector("[data-slideshow-next]");
-  const counter = document.querySelector("[data-slideshow-counter]");
-
-  let index = 0;
-  let timer = null;
-
-  // Build one full-width slide per image.
+  // Build the responsive grid of clickable thumbnails.
   images.forEach(function (file, i) {
-    const slide = document.createElement("figure");
-    slide.className = "slideshow-slide";
-    slide.tabIndex = 0;
-    slide.setAttribute("role", "button");
-    slide.setAttribute("aria-label", "View photo " + (i + 1) + " full screen");
+    const item = document.createElement("figure");
+    item.className = "gallery-item";
+    item.tabIndex = 0;
+    item.setAttribute("role", "button");
+    item.setAttribute("aria-label", "View photo " + (i + 1) + " full screen");
 
     const img = document.createElement("img");
     img.src = "images/" + file;
     img.alt = "Magrim Repairs completed rim repair work";
-    img.loading = i < 2 ? "eager" : "lazy";
+    img.loading = i < 6 ? "eager" : "lazy";
     img.setAttribute("data-fallback", "Photo " + (i + 1));
-    slide.appendChild(img);
+    item.appendChild(img);
 
-    slide.addEventListener("click", function () {
+    item.addEventListener("click", function () {
       openLightbox(i);
     });
-    slide.addEventListener("keydown", function (e) {
+    item.addEventListener("keydown", function (e) {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         openLightbox(i);
       }
     });
 
-    track.appendChild(slide);
+    grid.appendChild(item);
   });
-
-  function goTo(i) {
-    index = (i + images.length) % images.length;
-    track.style.transform = "translateX(-" + index * 100 + "%)";
-    if (counter) counter.textContent = index + 1 + " / " + images.length;
-  }
-
-  function startAuto() {
-    if (reduceMotion || images.length < 2) return;
-    timer = window.setInterval(function () {
-      goTo(index + 1);
-    }, 5000);
-  }
-  function stopAuto() {
-    if (timer) {
-      window.clearInterval(timer);
-      timer = null;
-    }
-  }
-  function restartAuto() {
-    stopAuto();
-    startAuto();
-  }
-
-  if (prevArrow) {
-    prevArrow.addEventListener("click", function () {
-      goTo(index - 1);
-      restartAuto();
-    });
-  }
-  if (nextArrow) {
-    nextArrow.addEventListener("click", function () {
-      goTo(index + 1);
-      restartAuto();
-    });
-  }
-
-  if (slideshow) {
-    // Pause auto-advance while the visitor is interacting.
-    slideshow.addEventListener("mouseenter", stopAuto);
-    slideshow.addEventListener("mouseleave", startAuto);
-    slideshow.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowLeft") {
-        goTo(index - 1);
-        restartAuto();
-      } else if (e.key === "ArrowRight") {
-        goTo(index + 1);
-        restartAuto();
-      }
-    });
-  }
-
-  // Touch swipe to slide left/right.
-  let swipeX = 0;
-  let swiping = false;
-  track.addEventListener(
-    "touchstart",
-    function (e) {
-      swipeX = e.touches[0].clientX;
-      swiping = true;
-      stopAuto();
-    },
-    { passive: true }
-  );
-  track.addEventListener(
-    "touchend",
-    function (e) {
-      if (!swiping) return;
-      swiping = false;
-      const dx = e.changedTouches[0].clientX - swipeX;
-      if (Math.abs(dx) > 45) goTo(index + (dx < 0 ? 1 : -1));
-      restartAuto();
-    },
-    { passive: true }
-  );
-
-  window.addEventListener("resize", function () {
-    track.style.transform = "translateX(-" + index * 100 + "%)";
-  });
-
-  goTo(0);
-  startAuto();
 
   // ===== Lightbox =====
   const lightbox = document.querySelector("[data-lightbox]");
