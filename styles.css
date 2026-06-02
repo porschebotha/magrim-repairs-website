@@ -326,10 +326,10 @@ h1, h2, h3 {
 .hero-bg {
   position: absolute;
   inset: 0;
-  /* Hero background — images/logo-10.png (Magrim showroom). Static, no
+  /* Hero background — images/logo-11.png (Magrim showroom). Static, no
      scale or animation, so the workshop, vehicles, logo and wheels are
      all visible at first paint. */
-  background-image: url("images/logo-10.png");
+  background-image: url("images/logo-11.png");
   background-size: cover;
   background-position: center 30%;
   background-color: var(--charcoal-deep);

@@ -6,7 +6,7 @@ This folder holds the Magrim Repairs photos used across the website.
 
 | Image(s)                         | Where it appears                              |
 |-----------------------------------|-----------------------------------------------|
-| `logo-10.png`                     | Homepage hero background (set in `styles.css`) |
+| `logo-11.png`                     | Homepage hero background (set in `styles.css`) |
 | `logo-8.png`                      | Header logo (navbar)                            |
 | `logo-2.png`                      | "About Magrim Repairs" section                  |
 | `image-1.png`                     | "Get in Touch" / contact section               |
