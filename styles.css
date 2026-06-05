@@ -866,12 +866,12 @@ h1, h2, h3 {
 }
 .review-slide {
   flex: 0 0 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.4rem;
   padding: 0.5rem;
   box-sizing: border-box;
-  align-items: stretch;
+  display: flex;
+}
+@media (min-width: 861px) {
+  .review-slide { flex: 0 0 calc(100% / 3); }
 }
 .review-slide .review-card {
   width: 100%;
@@ -880,8 +880,112 @@ h1, h2, h3 {
   flex-direction: column;
 }
 .review-slide .review-text { flex: 1; }
-@media (max-width: 860px) {
-  .review-slide { grid-template-columns: 1fr; }
+
+/* ===== Reviews heading + rating summary ===== */
+.reviews-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 1.6rem;
+}
+.reviews-heading .section-title { margin-bottom: 0.5rem; }
+.reviews-heading .section-intro { margin-bottom: 0; }
+
+.google-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.85rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: "Sora", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+}
+.google-g {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      from -90deg,
+      #4285f4 0deg 90deg,
+      #34a853 90deg 180deg,
+      #fbbc05 180deg 270deg,
+      #ea4335 270deg 360deg
+    );
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 0.78rem;
+  line-height: 1;
+  color: transparent;
+}
+.google-g::before {
+  content: "G";
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #4285f4;
+}
+
+.reviews-rating {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.2rem 1.4rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--red);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 1.6rem;
+  flex-wrap: wrap;
+}
+.rating-score { display: flex; align-items: baseline; gap: 0.25rem; }
+.rating-number {
+  font-family: "Sora", sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1;
+}
+.rating-of {
+  font-family: "Sora", sans-serif;
+  font-size: 1rem;
+  color: var(--ink-faint);
+}
+.rating-stars {
+  color: var(--red);
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+}
+.rating-meta { display: flex; flex-direction: column; line-height: 1.3; }
+.rating-meta strong { color: var(--ink); font-size: 0.92rem; }
+.rating-meta span { color: var(--ink-soft); font-size: 0.85rem; }
+
+/* Subtle quote mark in review card */
+.review-card { overflow: hidden; }
+.review-card::before {
+  content: "\201C";
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  font-family: "Sora", serif;
+  font-size: 4.8rem;
+  line-height: 1;
+  color: var(--red);
+  opacity: 0.08;
+  pointer-events: none;
+  font-weight: 800;
 }
 
 .reviews-arrow {

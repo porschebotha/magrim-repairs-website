@@ -371,23 +371,50 @@ function setupReviewsCarousel(reduceMotion) {
   const dotsWrap = carousel.querySelector("[data-reviews-dots]");
   if (!track || slides.length === 0) return;
 
+  const AUTO_MS = 5000;
+  const MEDIA = window.matchMedia("(min-width: 861px)");
+  let pageSize = MEDIA.matches ? 3 : 1;
+  let pageCount = Math.ceil(slides.length / pageSize);
   let index = 0;
   let timer = null;
-  const AUTO_MS = 8000;
 
-  function goTo(i) {
-    index = (i + slides.length) % slides.length;
+  function applyTransform() {
     track.style.transform = "translateX(-" + index * 100 + "%)";
-    if (dotsWrap) {
-      dotsWrap.querySelectorAll(".reviews-dot").forEach(function (d, n) {
-        d.classList.toggle("active", n === index);
-        d.setAttribute("aria-current", n === index ? "true" : "false");
+  }
+
+  function updateDots() {
+    if (!dotsWrap) return;
+    dotsWrap.querySelectorAll(".reviews-dot").forEach(function (d, n) {
+      d.classList.toggle("active", n === index);
+      d.setAttribute("aria-current", n === index ? "true" : "false");
+    });
+  }
+
+  function buildDots() {
+    if (!dotsWrap) return;
+    dotsWrap.innerHTML = "";
+    for (let i = 0; i < pageCount; i++) {
+      const dot = document.createElement("button");
+      const targetIndex = i;
+      dot.type = "button";
+      dot.className = "reviews-dot";
+      dot.setAttribute("aria-label", "Go to review page " + (i + 1));
+      dot.addEventListener("click", function () {
+        goTo(targetIndex);
+        restartAuto();
       });
+      dotsWrap.appendChild(dot);
     }
   }
 
+  function goTo(i) {
+    index = ((i % pageCount) + pageCount) % pageCount;
+    applyTransform();
+    updateDots();
+  }
+
   function startAuto() {
-    if (reduceMotion || slides.length < 2) return;
+    if (reduceMotion || pageCount < 2) return;
     timer = window.setInterval(function () {
       goTo(index + 1);
     }, AUTO_MS);
@@ -403,20 +430,20 @@ function setupReviewsCarousel(reduceMotion) {
     startAuto();
   }
 
-  // Build navigation dots — one per slide.
-  if (dotsWrap) {
-    slides.forEach(function (_, i) {
-      const dot = document.createElement("button");
-      dot.type = "button";
-      dot.className = "reviews-dot";
-      dot.setAttribute("aria-label", "Go to review " + (i + 1));
-      dot.addEventListener("click", function () {
-        goTo(i);
-        restartAuto();
-      });
-      dotsWrap.appendChild(dot);
-    });
+  function recompute() {
+    const newPageSize = MEDIA.matches ? 3 : 1;
+    if (newPageSize !== pageSize) {
+      pageSize = newPageSize;
+      pageCount = Math.ceil(slides.length / pageSize);
+      buildDots();
+      if (index >= pageCount) index = pageCount - 1;
+    }
+    applyTransform();
+    updateDots();
   }
+
+  buildDots();
+  goTo(0);
 
   if (prevArrow) {
     prevArrow.addEventListener("click", function () {
@@ -468,10 +495,10 @@ function setupReviewsCarousel(reduceMotion) {
     { passive: true }
   );
 
-  window.addEventListener("resize", function () {
-    track.style.transform = "translateX(-" + index * 100 + "%)";
-  });
+  window.addEventListener("resize", recompute);
+  if (typeof MEDIA.addEventListener === "function") {
+    MEDIA.addEventListener("change", recompute);
+  }
 
-  goTo(0);
   startAuto();
 }
